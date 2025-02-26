@@ -1,10 +1,20 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-class login_screen extends StatefulWidget{
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    throw UnimplementedError();
-  }
 
+class WebLoginPage extends StatefulWidget {
+  @override
+  _WebLoginPageState createState() => _WebLoginPageState();
+}
+
+class _WebLoginPageState extends State<WebLoginPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Login'),
+      ),
+      body: Center(
+        child: Text("Web Login Page"),
+      ),
+    );
+  }
 }

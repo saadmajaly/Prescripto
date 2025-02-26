@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => kIsWeb ? login_screen() : Login(),
+        '/': (context) => kIsWeb ? WebLoginPage() : Login(),
       },
     );
   }
