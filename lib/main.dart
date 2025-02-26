@@ -18,12 +18,10 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // Populate test data on startup (only for development!)
-    db.select(db.users).get().then((users) {
-      for (var user in users) {
-        print('User: ${user.firstName} ${user.lastName}, Email: ${user.email}');
-      }
-    });
+    var db = AppDatabase();
+    db.clearDatabase(db);
+    db.populateTestData();
+    print('Test data populated successfully.');
   }
 
   @override
