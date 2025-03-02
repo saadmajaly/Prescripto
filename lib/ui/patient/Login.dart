@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/ui/patient/Signup.dart';
 
 class Login extends StatefulWidget {
   @override
+  // ignore: library_private_types_in_public_api
   _WebLoginPageState createState() => _WebLoginPageState();
 }
 
@@ -148,7 +150,10 @@ Row(
     ),
     TextButton(
       onPressed: () {
-        // Handle "Sign up" navigation
+          Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) =>  SignUpScreen()),
+        );
       },
       child: const Text(
         'Sign up',
