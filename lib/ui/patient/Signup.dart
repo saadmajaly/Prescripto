@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/ui/patient/Login.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -240,7 +241,9 @@ bool _agreeToTerms = false;
                         foregroundColor: Colors.black, // Text color
                       ),
                       onPressed: () {
-                        // : Navigate to login screen
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) =>  Login()));
                       },
                       child: const Text('Log in'),
                     ),

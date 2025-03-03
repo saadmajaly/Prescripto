@@ -65,7 +65,7 @@ class _WebLoginPageState extends State<Login> {
               const SizedBox(height: 40),
               // Page Title
               const Text(
-                'Sign in to your account',
+                'Log in to your account',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
