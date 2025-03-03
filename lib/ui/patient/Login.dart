@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../AuthLogic/AuthProvider.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -17,10 +20,19 @@ class _WebLoginPageState extends State<Login> {
     super.dispose();
   }
 
-  void _onLogin() {
-    //  Implement your login logic here
+  void _onLogin() async {
     if (_formKey.currentState!.validate()) {
-      // Perform login
+      try {
+        await Provider.of<AuthProvider>(context, listen: false).login(
+          _nationalIdController.text,
+          _passwordController.text,
+        );
+        // Navigation to the HomePage will be handled by the Consumer in MyApp.
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.toString())),
+        );
+      }
     }
   }
 
@@ -148,7 +160,11 @@ Row(
     ),
     TextButton(
       onPressed: () {
-        // Handle "Sign up" navigation
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => ),
+        // );
+
       },
       child: const Text(
         'Sign up',
