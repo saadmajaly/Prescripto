@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../AuthLogic/AuthProvider.dart';
+import 'package:prescripto/ui/patient/Signup.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -160,11 +161,10 @@ Row(
     ),
     TextButton(
       onPressed: () {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => ),
-        // );
-
+          Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) =>  SignUpScreen()),
+        );
       },
       child: const Text(
         'Sign up',
