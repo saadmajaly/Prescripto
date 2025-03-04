@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-A simple HomePage widget that is displayed when the user is authenticated.
+// A simple HomePage widget that is displayed when the user is authenticated.
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
