@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Prescripto 103873892',
+      title: 'Prescripto',
       debugShowCheckedModeBanner: false,
       home: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
