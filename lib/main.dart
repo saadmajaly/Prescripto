@@ -15,7 +15,6 @@ import 'package:prescripto/AuthLogic/AuthProvider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   // Initialize and load authentication state
   final authProvider = AuthProvider();
   await authProvider.loadAuthState();

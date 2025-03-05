@@ -141,7 +141,9 @@ class _WebLoginPageState extends State<WebLoginPage>
                       child: Text('Forgot your password?'),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                       //route the user to the signup page
+                      },
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.black,
                          textStyle: TextStyle(fontWeight: FontWeight.bold),
