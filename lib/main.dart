@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:prescripto/ui/patient/Signup.dart';
+import 'package:prescripto/ui/Mobile/Signup.dart';
 import 'package:provider/provider.dart';
 
 // Data layer
 import 'package:prescripto/data/database.dart';
 // Auth screens
-import 'package:prescripto/ui/auth/login_screen.dart';
-import 'package:prescripto/ui/auth/signup_screen.dart';
+import 'package:prescripto/ui/Web/Common/login_screen.dart';
+import 'package:prescripto/ui/Web/Common/signup_screen.dart';
 // Patient (mobile) login
-import 'package:prescripto/ui/patient/Login.dart';
+import 'package:prescripto/ui/Mobile/Login.dart';
 // Auth provider (make sure the path is correct)
 import 'package:prescripto/AuthLogic/AuthProvider.dart';
 

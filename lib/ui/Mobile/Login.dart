@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../AuthLogic/AuthProvider.dart';
-import 'package:prescripto/ui/patient/Signup.dart';
+import 'package:prescripto/ui/Mobile/Signup.dart';
 
 class Login extends StatefulWidget {
   @override
