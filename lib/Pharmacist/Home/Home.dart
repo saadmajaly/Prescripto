@@ -14,7 +14,7 @@ class _pharmacistHomePage extends State<pharmacistHome> {
     return Scaffold(
         appBar: AppBar(
           title: const Text(
-            'physician home page',
+            'pharmacist home page',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         )
