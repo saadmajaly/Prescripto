@@ -1,23 +1,33 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:prescripto/ui/Mobile/Home.dart';
 import 'package:prescripto/ui/Mobile/Signup.dart';
+import 'package:prescripto/ui/Web/Pharmacist/Home.dart';
+import 'package:prescripto/ui/Web/physician/Home.dart';
 import 'package:provider/provider.dart';
 
 // Data layer
 import 'package:prescripto/data/database.dart';
 // Auth screens
 import 'package:prescripto/ui/Web/Common/login_screen.dart';
-import 'package:prescripto/ui/Web/Common/signup_screen.dart';
 // Patient (mobile) login
 import 'package:prescripto/ui/Mobile/Login.dart';
 // Auth provider (make sure the path is correct)
 import 'package:prescripto/AuthLogic/AuthProvider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+bool isLoggedIn = false;
+var role = "";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize and load authentication state
-  final authProvider = AuthProvider();
-  await authProvider.loadAuthState();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  isLoggedIn = prefs.getBool('isLoggedIn')??false;
+  role = prefs.getString('userRole')??"";
+  final db = AppDatabase();
+  // final usersList = await db.select(db.users).get();
+  // print(usersList);
+  final authProvider = AuthProvider(db);
 
   runApp(
     ChangeNotifierProvider<AuthProvider>.value(
@@ -28,6 +38,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -37,8 +49,17 @@ class MyApp extends StatelessWidget {
         builder: (context, authProvider, child) {
           // If the user is authenticated, show HomePage
           // Otherwise, display the login screen based on platform.
-          if (authProvider.isAuthenticated) {
-            return HomePage();
+          if (isLoggedIn) {
+            switch(role){
+              case "patient": return patientHome();
+              break;
+              case "physician": return physicianHome();
+              break;
+              case "pharmacist": return pharmacistHome();
+              break;
+              default: return kIsWeb ? WebLoginPage() : Login();
+            }
+
           } else {
             return kIsWeb ? WebLoginPage() : Login();
           }
@@ -54,6 +75,8 @@ class MyApp extends StatelessWidget {
 
 // A simple HomePage widget that is displayed when the user is authenticated.
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

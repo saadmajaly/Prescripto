@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
@@ -138,8 +137,8 @@ class PharmacyInsurances extends Table {
   IntColumn get insuranceId => integer()();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(pharmacyId) REFERENCES pharmacies(pharmacyId)',
-    'FOREIGN KEY(insuranceId) REFERENCES insurances(id)'
+    'FOREIGN KEY(pharmacy_id) REFERENCES pharmacies(pharmacyId)',
+    'FOREIGN KEY(insurance_id) REFERENCES insurances(id)'
   ];
 }
 
@@ -151,7 +150,7 @@ class BlockchainTransactions extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(prescriptionId) REFERENCES prescriptions(prescriptionId)'
+    'FOREIGN KEY(prescription_id) REFERENCES prescriptions(prescriptionId)'
   ];
 }
 

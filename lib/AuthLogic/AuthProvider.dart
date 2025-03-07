@@ -1,39 +1,43 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:prescripto/data/database.dart';
 
-class AuthProvider extends ChangeNotifier {
-  bool _isAuthenticated = false;
-  bool get isAuthenticated => _isAuthenticated;
+class AuthProvider with ChangeNotifier{
 
-  /// Attempts to log in with the given [nationalId] and [password].
-  ///
-  /// Replace the dummy check with your actual authentication logic.
-  Future<void> login(String nationalId, String password) async {
-    // Dummy credentials check - replace with your API or DB check.
-    if (nationalId == '123456789' && password == 'password') {
-      _isAuthenticated = true;
-      notifyListeners();
+  final AppDatabase db;
+  AuthProvider(this.db);
 
-      // Persist the login state using SharedPreferences.
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isAuthenticated', true);
-    } else {
-      throw Exception('Invalid credentials');
+  //this function takes the user nationalId and the password and the role as parameters
+  Future<bool> Login(String nationalId, String hashedPassword, String role) async {
+    //this statement selects the user using the nationalId
+    final query = db.select(db.users)
+      ..where((tbl) => tbl.nationalId.equals(nationalId));
+    final user = await query.getSingleOrNull();
+    //this statement check if the user exist?
+    if (user != null) {
+      //compare the user with the hashed password and the role
+      if (user.passwordHash == hashedPassword && user.role == role) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        // store the most used user info in the session to be used in the next pages and processes
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('userEmail', user.email);
+        await prefs.setInt('userId', user.id);
+        await prefs.setString('userRole', role);
+        return true;
+      }
     }
+    return false;
   }
 
-  /// Loads the authentication state from SharedPreferences during app startup.
-  Future<void> loadAuthState() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
-    notifyListeners();
-  }
-
-  /// Logs out the user by clearing the authentication state.
+  //logs the user out and clear the session data
   Future<void> logout() async {
-    _isAuthenticated = false;
-    notifyListeners();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('isAuthenticated');
+    await prefs.clear();
   }
+
+  Future<bool> isLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLoggedIn')??false;
+  }
+
 }
