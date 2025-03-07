@@ -1,17 +1,17 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:prescripto/ui/Mobile/Home.dart';
-import 'package:prescripto/ui/Mobile/Signup.dart';
-import 'package:prescripto/ui/Web/Pharmacist/Home.dart';
-import 'package:prescripto/ui/Web/physician/Home.dart';
+import 'package:prescripto/Patient/Home/Home.dart';
+import 'package:prescripto/Patient/Auth/Signup.dart';
+import 'package:prescripto/Pharmacist/Home/Home.dart';
+import 'package:prescripto/physician/Home/Home.dart';
 import 'package:provider/provider.dart';
 
 // Data layer
 import 'package:prescripto/data/database.dart';
 // Auth screens
-import 'package:prescripto/ui/Web/Common/login_screen.dart';
+import 'package:prescripto/CommonWeb/login_screen.dart';
 // Patient (mobile) login
-import 'package:prescripto/ui/Mobile/Login.dart';
+import 'package:prescripto/Patient/Auth/Login.dart';
 // Auth provider (make sure the path is correct)
 import 'package:prescripto/AuthLogic/AuthProvider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,11 +29,11 @@ void main() async {
   var users = await db.getAllUsers();
   print(users.length);
   for( var user in users){
-    print(user.firstName + "/n");
-    print(user.nationalId + "/n");
-    print(user.passwordHash + "/n");
-    print(user.role + "/n");
-    print("-------------------------");
+    print(user.firstName + "\n");
+    print(user.nationalId + "\n");
+    print(user.passwordHash + "\n");
+    print(user.role + "\n");
+    print("-------------------------\n");
   }
   // final usersList = await db.select(db.users).get();
   // print(usersList);

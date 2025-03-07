@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:prescripto/ui/Mobile/Login.dart';
+import 'package:prescripto/Patient/Auth/Login.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

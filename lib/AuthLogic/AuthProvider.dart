@@ -12,7 +12,11 @@ class AuthProvider with ChangeNotifier{
     //this statement selects the user using the nationalId
     final query = db.select(db.users)
       ..where((tbl) => tbl.nationalId.equals(nationalId));
+
     final user = await query.getSingleOrNull();
+    print(user!.role + "\n");
+    print(user!.passwordHash + "\n");
+    print(user!.nationalId + "\n");
     //this statement check if the user exist?
     if (user != null) {
       //compare the user with the hashed password and the role

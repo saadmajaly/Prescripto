@@ -1,10 +1,10 @@
 
  import 'package:flutter/material.dart';
-import 'package:prescripto/ui/Web/Pharmacist/Home.dart';
-import 'package:prescripto/ui/Web/physician/Home.dart';
+import 'package:prescripto/Pharmacist/Home/Home.dart';
+import 'package:prescripto/physician/Home/Home.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
- import '../../../AuthLogic/AuthProvider.dart';
+ import '../AuthLogic/AuthProvider.dart';
 
 class WebLoginPage extends StatefulWidget {
   const WebLoginPage({super.key});
@@ -95,7 +95,6 @@ class _WebLoginPageState extends State<WebLoginPage>
                 // Navigation Links
                 Row(
                   children: [
-                    _buildNavItem("Home"),
                     _buildNavItem("Features"),
                     _buildNavItem("Pricing"),
                     _buildNavItem("Resources"),
@@ -121,8 +120,8 @@ class _WebLoginPageState extends State<WebLoginPage>
 
                     // Placeholder for Logo
                     Image.asset(
-                      'images/Weblogin.jpg',
-                      width: 300,
+                      'assets/WebLogin.png',
+                      width: 812,
                       height: 150,
                       fit: BoxFit.cover,
                     ),
@@ -173,7 +172,7 @@ class _WebLoginPageState extends State<WebLoginPage>
                         // Login Button
                         ElevatedButton(
                           onPressed: () {
-
+                            _onLogin();
                           },
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(double.infinity, 50),

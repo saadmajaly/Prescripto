@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../AuthLogic/AuthProvider.dart';
-import 'package:prescripto/ui/Mobile/Signup.dart';
-import 'Home.dart';
+import '../../../AuthLogic/AuthProvider.dart';
+import 'package:prescripto/Patient/Auth/Signup.dart';
+import '../Home/Home.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
