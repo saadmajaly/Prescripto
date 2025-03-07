@@ -1,3 +1,4 @@
+
 import 'dart:math';
 
 import 'package:drift_flutter/drift_flutter.dart';
@@ -138,8 +139,8 @@ class PharmacyInsurances extends Table {
   IntColumn get insuranceId => integer()();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(pharmacyId) REFERENCES pharmacies(pharmacyId)',
-    'FOREIGN KEY(insuranceId) REFERENCES insurances(id)'
+    'FOREIGN KEY(pharmacy_id) REFERENCES pharmacies(pharmacyId)',
+    'FOREIGN KEY(insurance_id) REFERENCES insurances(id)'
   ];
 }
 
@@ -151,7 +152,7 @@ class BlockchainTransactions extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(prescriptionId) REFERENCES prescriptions(prescriptionId)'
+    'FOREIGN KEY(prescription_id) REFERENCES prescriptions(prescriptionId)'
   ];
 }
 
@@ -192,6 +193,8 @@ class AppDatabase extends _$AppDatabase {
           ),
         ),
   );
+
+  Future<List<User>> getAllUsers() => select(users).get();
 
   AppDatabase.forTesting(DatabaseConnection super.connection);
 
@@ -458,7 +461,7 @@ class AppDatabase extends _$AppDatabase {
     // --- Insert PharmacyInsurances: Each Pharmacy Gets 1-2 Random Insurances ---
     final List<Insurance> insuranceList = await select(insurances).get();
     for (var pharmacy in pharmacyList) {
-      int count = 1 + rand.nextInt(2);
+      int count = (1 + rand.nextInt(2));
       for (int i = 0; i < count; i++) {
         final ins = insuranceList[rand.nextInt(insuranceList.length)];
         await into(pharmacyInsurances).insert(

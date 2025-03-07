@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../AuthLogic/AuthProvider.dart';
-import 'package:prescripto/ui/patient/Signup.dart';
+import 'package:prescripto/ui/Mobile/Signup.dart';
+import 'Home.dart';
 
 class Login extends StatefulWidget {
+  const Login({super.key});
+
   @override
   _WebLoginPageState createState() => _WebLoginPageState();
 }
@@ -24,10 +27,21 @@ class _WebLoginPageState extends State<Login> {
   void _onLogin() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await Provider.of<AuthProvider>(context, listen: false).login(
+        bool loginSuccessful = await Provider.of<AuthProvider>(context, listen: false).Login(
           _nationalIdController.text,
           _passwordController.text,
+          "patient"
         );
+        if (loginSuccessful) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => patientHome()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Invalid National ID or password')),
+          );
+        }
         // Navigation to the HomePage will be handled by the Consumer in MyApp.
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -44,7 +58,9 @@ class _WebLoginPageState extends State<Login> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            _onLogin();
+          },
         ),
         title: const Text(
           'Login',
