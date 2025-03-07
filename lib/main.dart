@@ -25,6 +25,16 @@ void main() async {
   isLoggedIn = prefs.getBool('isLoggedIn')??false;
   role = prefs.getString('userRole')??"";
   final db = AppDatabase();
+  await db.populateTestData();
+  var users = await db.getAllUsers();
+  print(users.length);
+  for( var user in users){
+    print(user.firstName + "/n");
+    print(user.nationalId + "/n");
+    print(user.passwordHash + "/n");
+    print(user.role + "/n");
+    print("-------------------------");
+  }
   // final usersList = await db.select(db.users).get();
   // print(usersList);
   final authProvider = AuthProvider(db);
