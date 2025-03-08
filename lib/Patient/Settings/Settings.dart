@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/AuthLogic/AuthProvider.dart';
+import 'package:prescripto/Patient/Auth/Login.dart';
+import 'package:prescripto/data/database.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -126,7 +129,13 @@ class _Settings extends State<Settings> {
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
               ),
               onPressed: () {
-                // Handle log out
+                AppDatabase db = new AppDatabase();
+                AuthProvider Auth = new AuthProvider(db);
+                Auth.logout();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Login()),
+                );
               },
               child: const Text(
                 'Log out',

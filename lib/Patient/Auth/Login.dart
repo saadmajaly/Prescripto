@@ -57,12 +57,6 @@ class _WebLoginPageState extends State<Login> {
     return Scaffold(
       // AppBar with a back button (optional)
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            _onLogin();
-          },
-        ),
         title: const Text(
           'Login',
           style: TextStyle(fontWeight: FontWeight.bold),
