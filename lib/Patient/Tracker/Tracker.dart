@@ -13,7 +13,7 @@ class _Tracker extends State<Tracker> {
     return Scaffold(
         appBar: AppBar(
           title: const Text(
-            'Patient prescription page',
+            'Patient Tracker page',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         )

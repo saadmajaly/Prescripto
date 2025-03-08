@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:prescripto/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:prescripto/data/database.dart';
 
@@ -39,6 +40,7 @@ class AuthProvider with ChangeNotifier{
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+    main();
   }
 
   Future<bool> isLoggedIn() async {

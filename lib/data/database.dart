@@ -231,7 +231,18 @@ class AppDatabase extends _$AppDatabase {
       'Clark', 'Lewis', 'Walker', 'Hall', 'Allen',
       'Young', 'King', 'Wright', 'Scott', 'Green'
     ];
-
+    await into(users).insert(
+      UsersCompanion.insert(
+        firstName: "Test",
+        lastName: "Test",
+        email: 'test@example.com',
+        phone: Value('555-01${rand.nextInt(90).toString().padLeft(2, '0')}'),
+        nationalId: '9999999999',
+        syndicateNumber: const Value(null),
+        passwordHash: 'test',
+        role: 'patient',
+      ),
+    );
     // --- Insert 200 Patients ---
     for (int i = 0; i < 200; i++) {
       final String firstName =
@@ -244,7 +255,7 @@ class AppDatabase extends _$AppDatabase {
           lastName: lastName,
           email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@example.com',
           phone: Value('555-01${rand.nextInt(90).toString().padLeft(2, '0')}'),
-          nationalId: 'NID-${100000000 + rand.nextInt(900000000)}',
+          nationalId: '${1000000000 + rand.nextInt(9000000000)}',
           syndicateNumber: const Value(null),
           passwordHash: 'hashed_password',
           role: 'patient',
@@ -252,6 +263,18 @@ class AppDatabase extends _$AppDatabase {
       );
     }
 
+    await into(users).insert(
+      UsersCompanion.insert(
+        firstName: "Physician",
+        lastName: "Test",
+        email: 'test@hospital.com',
+        phone: Value('555-10${rand.nextInt(90).toString().padLeft(2, '0')}'),
+        nationalId: '8888888888',
+        syndicateNumber: Value('DOC-${2000}'),
+        passwordHash: 'test',
+        role: 'physician',
+      ),
+    );
     // --- Insert 100 Physicians ---
     for (int i = 0; i < 100; i++) {
       final String firstName =
@@ -264,13 +287,26 @@ class AppDatabase extends _$AppDatabase {
           lastName: lastName,
           email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@hospital.com',
           phone: Value('555-10${rand.nextInt(90).toString().padLeft(2, '0')}'),
-          nationalId: 'NID-DOCTOR-${100000000 + rand.nextInt(900000000)}',
+          nationalId: '${100000000 + rand.nextInt(900000000)}',
           syndicateNumber: Value('DOC-${1000 + i}'),
           passwordHash: 'hashed_password',
           role: 'physician',
         ),
       );
     }
+
+    await into(users).insert(
+      UsersCompanion.insert(
+        firstName: "Pharmacist",
+        lastName: "Test",
+        email: 'test@pharmacy.com',
+        phone: Value('555-20${rand.nextInt(90).toString().padLeft(2, '0')}'),
+        nationalId: '7777777777',
+        syndicateNumber: Value('PHARM-${2000}'),
+        passwordHash: 'test',
+        role: 'pharmacist',
+      ),
+    );
 
     // --- Insert 100 Pharmacists ---
     for (int i = 0; i < 100; i++) {
@@ -284,7 +320,7 @@ class AppDatabase extends _$AppDatabase {
           lastName: lastName,
           email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@pharmacy.com',
           phone: Value('555-20${rand.nextInt(90).toString().padLeft(2, '0')}'),
-          nationalId: 'NID-PHARM-${100000000 + rand.nextInt(900000000)}',
+          nationalId: '${100000000 + rand.nextInt(900000000)}',
           syndicateNumber: Value('PHARM-${1000 + i}'),
           passwordHash: 'hashed_password',
           role: 'pharmacist',

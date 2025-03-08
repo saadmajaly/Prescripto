@@ -13,7 +13,7 @@ class _Settings extends State<Settings> {
     return Scaffold(
         appBar: AppBar(
           title: const Text(
-            'Patient prescription page',
+            'Patient Settings page',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         )
