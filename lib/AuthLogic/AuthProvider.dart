@@ -40,7 +40,6 @@ class AuthProvider with ChangeNotifier{
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    main();
   }
 
   Future<bool> isLoggedIn() async {
