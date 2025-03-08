@@ -19,18 +19,10 @@ class AuthProvider with ChangeNotifier{
       ..where((tbl) => tbl.nationalId.equals(nationalId));
 
     final user = await query.getSingleOrNull();
-    print(user!.role + "\n");
-    print(user!.passwordHash + "\n");
-    print(user!.nationalId + "\n");
     //this statement check if the user exist?
     if (user != null) {
-      print("1st step");
-      print(hashedPassword);
-      print(nationalId);
-      print(role);
       //compare the user with the hashed password and the role
       if (user.passwordHash == hashedPassword && user.role == role) {
-        print("2nd step");
         SharedPreferences prefs = await SharedPreferences.getInstance();
         // store the most used user info in the session to be used in the next pages and processes
         await prefs.setBool('isLoggedIn', true);
