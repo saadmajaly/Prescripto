@@ -197,6 +197,25 @@ class AppDatabase extends _$AppDatabase {
 
   AppDatabase.forTesting(DatabaseConnection super.connection);
 
+  Future<void> clearDatabase() async {
+    await transaction(() async {
+      // List all your tables here:
+      await delete(users).go();
+      await delete(pharmacies).go();
+      await delete(medications).go();
+      await delete(inventory).go();
+      await delete(prescriptions).go();
+      await delete(prescriptionItems).go();
+      await delete(feedbacks).go();
+      await delete(auditLogs).go();
+      await delete(emergencyAccessRequests).go();
+      await delete(insurances).go();
+      await delete(pharmacyInsurances).go();
+      await delete(blockchainTransactions).go();
+    });
+  }
+
+
   // -------------------------
   // Data Population Method
   // -------------------------
@@ -231,6 +250,7 @@ class AppDatabase extends _$AppDatabase {
       'Clark', 'Lewis', 'Walker', 'Hall', 'Allen',
       'Young', 'King', 'Wright', 'Scott', 'Green'
     ];
+
     await into(users).insert(
       UsersCompanion.insert(
         firstName: "Test",
@@ -244,24 +264,24 @@ class AppDatabase extends _$AppDatabase {
       ),
     );
     // --- Insert 200 Patients ---
-    for (int i = 0; i < 200; i++) {
-      final String firstName =
-      patientFirstNames[rand.nextInt(patientFirstNames.length)];
-      final String lastName =
-      patientLastNames[rand.nextInt(patientLastNames.length)];
-      await into(users).insert(
-        UsersCompanion.insert(
-          firstName: firstName,
-          lastName: lastName,
-          email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@example.com',
-          phone: Value('555-01${rand.nextInt(90).toString().padLeft(2, '0')}'),
-          nationalId: '${1000000000 + rand.nextInt(9000000000)}',
-          syndicateNumber: const Value(null),
-          passwordHash: 'hashed_password',
-          role: 'patient',
-        ),
-      );
-    }
+    // for (int i = 0; i < 200; i++) {
+    //   final String firstName =
+    //   patientFirstNames[rand.nextInt(patientFirstNames.length)];
+    //   final String lastName =
+    //   patientLastNames[rand.nextInt(patientLastNames.length)];
+    //   await into(users).insert(
+    //     UsersCompanion.insert(
+    //       firstName: firstName,
+    //       lastName: lastName,
+    //       email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@example.com',
+    //       phone: Value('555-01${rand.nextInt(90).toString().padLeft(2, '0')}'),
+    //       nationalId: '${1000000000 + rand.nextInt(900000000)}',
+    //       syndicateNumber: const Value(null),
+    //       passwordHash: 'hashed_password',
+    //       role: 'patient',
+    //     ),
+    //   );
+    // }
 
     await into(users).insert(
       UsersCompanion.insert(
@@ -276,24 +296,24 @@ class AppDatabase extends _$AppDatabase {
       ),
     );
     // --- Insert 100 Physicians ---
-    for (int i = 0; i < 100; i++) {
-      final String firstName =
-      doctorFirstNames[rand.nextInt(doctorFirstNames.length)];
-      final String lastName =
-      doctorLastNames[rand.nextInt(doctorLastNames.length)];
-      await into(users).insert(
-        UsersCompanion.insert(
-          firstName: firstName,
-          lastName: lastName,
-          email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@hospital.com',
-          phone: Value('555-10${rand.nextInt(90).toString().padLeft(2, '0')}'),
-          nationalId: '${100000000 + rand.nextInt(900000000)}',
-          syndicateNumber: Value('DOC-${1000 + i}'),
-          passwordHash: 'hashed_password',
-          role: 'physician',
-        ),
-      );
-    }
+    // for (int i = 0; i < 100; i++) {
+    //   final String firstName =
+    //   doctorFirstNames[rand.nextInt(doctorFirstNames.length)];
+    //   final String lastName =
+    //   doctorLastNames[rand.nextInt(doctorLastNames.length)];
+    //   await into(users).insert(
+    //     UsersCompanion.insert(
+    //       firstName: firstName,
+    //       lastName: lastName,
+    //       email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@hospital.com',
+    //       phone: Value('555-10${rand.nextInt(90).toString().padLeft(2, '0')}'),
+    //       nationalId: '${100000000 + rand.nextInt(900000000)}',
+    //       syndicateNumber: Value('DOC-${1000 + i}'),
+    //       passwordHash: 'hashed_password',
+    //       role: 'physician',
+    //     ),
+    //   );
+    // }
 
     await into(users).insert(
       UsersCompanion.insert(
@@ -309,24 +329,24 @@ class AppDatabase extends _$AppDatabase {
     );
 
     // --- Insert 100 Pharmacists ---
-    for (int i = 0; i < 100; i++) {
-      final String firstName =
-      pharmacistFirstNames[rand.nextInt(pharmacistFirstNames.length)];
-      final String lastName =
-      pharmacistLastNames[rand.nextInt(pharmacistLastNames.length)];
-      await into(users).insert(
-        UsersCompanion.insert(
-          firstName: firstName,
-          lastName: lastName,
-          email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@pharmacy.com',
-          phone: Value('555-20${rand.nextInt(90).toString().padLeft(2, '0')}'),
-          nationalId: '${100000000 + rand.nextInt(900000000)}',
-          syndicateNumber: Value('PHARM-${1000 + i}'),
-          passwordHash: 'hashed_password',
-          role: 'pharmacist',
-        ),
-      );
-    }
+    // for (int i = 0; i < 100; i++) {
+    //   final String firstName =
+    //   pharmacistFirstNames[rand.nextInt(pharmacistFirstNames.length)];
+    //   final String lastName =
+    //   pharmacistLastNames[rand.nextInt(pharmacistLastNames.length)];
+    //   await into(users).insert(
+    //     UsersCompanion.insert(
+    //       firstName: firstName,
+    //       lastName: lastName,
+    //       email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@pharmacy.com',
+    //       phone: Value('555-20${rand.nextInt(90).toString().padLeft(2, '0')}'),
+    //       nationalId: '${100000000 + rand.nextInt(900000000)}',
+    //       syndicateNumber: Value('PHARM-${1000 + i}'),
+    //       passwordHash: 'hashed_password',
+    //       role: 'pharmacist',
+    //     ),
+    //   );
+    // }
 
     // --- Insert 1 Admin ---
     await into(users).insert(
