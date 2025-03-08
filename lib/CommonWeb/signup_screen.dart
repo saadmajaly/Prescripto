@@ -12,90 +12,143 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 600), // Adjust width
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Navigation Bar
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // App Name
                   Text(
-                    'Sign up for an account',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    "Prescripto",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 5),
-                  Text(
-                    'Create an account to gain access to the Prescripto platform.',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                  SizedBox(height: 20),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey, width: 1)),
-                    ),
-                    child: Row(
-                      children: [
-                        _roleButton('Physician', isPhysician, () {
-                          setState(() {
-                            isPhysician = true;
-                          });
-                        }),
-                        _roleButton('Pharmacist', !isPhysician, () {
-                          setState(() {
-                            isPhysician = false;
-                          });
-                        }),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  _buildTextField('First Name'),
-                  _buildTextField('Last Name'),
-                  _buildTextField('Username'),
-                  _buildTextField('Email'),
-                  _buildTextField('National ID'),
-                  _buildTextField('Syndicate Number'),
-                  _buildTextField('Password', isPassword: true),
-                  _buildTextField('Confirm Password', isPassword: true),
-                  SizedBox(height: 10),
+                  // Navigation Links
                   Row(
                     children: [
-                      Checkbox(
-                        value: isChecked,
-                        onChanged: (value) {
-                          setState(() {
-                            isChecked = value!;
-                          });
+                      _buildNavItem("Features"),
+                      _buildNavItem("Pricing"),
+                      _buildNavItem("Resources"),
+                      SizedBox(width: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Navigate back to login
                         },
-                      ),
-                      Expanded(
-                        child: Text(
-                          "I agree to Prescripto's Terms of Service and Privacy Policy",
-                          style: TextStyle(fontSize: 12),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         ),
+                        child: Text("Login"),
                       ),
                     ],
-                  ),
-                  SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                      child: Text(
-                        'Sign Up',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ),
                   ),
                 ],
               ),
             ),
-          ),
+            // Signup Form
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 600), // Adjust width
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Sign up for an account',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        'Create an account to gain access to the Prescripto platform.',
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border(bottom: BorderSide(color: Colors.grey, width: 1)),
+                        ),
+                        child: Row(
+                          children: [
+                            _roleButton('Physician', isPhysician, () {
+                              setState(() {
+                                isPhysician = true;
+                              });
+                            }),
+                            _roleButton('Pharmacist', !isPhysician, () {
+                              setState(() {
+                                isPhysician = false;
+                              });
+                            }),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      _buildTextField('First Name'),
+                      _buildTextField('Last Name'),
+                      _buildTextField('Username'),
+                      _buildTextField('Email'),
+                      _buildTextField('National ID'),
+                      _buildTextField('Syndicate Number'),
+                      _buildTextField('Password', isPassword: true),
+                      _buildTextField('Confirm Password', isPassword: true),
+                      SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: isChecked,
+                            onChanged: (value) {
+                              setState(() {
+                                isChecked = value!;
+                              });
+                            },
+                          ),
+                          Expanded(
+                            child: Text(
+                              "I agree to Prescripto's Terms of Service and Privacy Policy",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                          child: Text(
+                            'Sign Up',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(String title) {
+    return Padding(
+      padding: EdgeInsets.only(left: 20),
+      child: Text(
+        title,
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black54),
       ),
     );
   }
