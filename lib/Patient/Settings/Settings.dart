@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class Tracker extends StatefulWidget {
-  const Tracker({super.key});
+class Settings extends StatefulWidget {
+  const Settings({super.key});
 
   @override
-  _Tracker createState() => _Tracker();
+  _Settings createState() => _Settings();
 }
 
-class _Tracker extends State<Tracker> {
+class _Settings extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

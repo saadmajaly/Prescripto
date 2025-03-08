@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:prescripto/Patient/Home/Home.dart';
+import 'package:prescripto/Patient/MainScreen.dart';
 import 'package:prescripto/Patient/Auth/Signup.dart';
 import 'package:prescripto/Pharmacist/Home/Home.dart';
 import 'package:prescripto/physician/Home/Home.dart';
@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
           // Otherwise, display the login screen based on platform.
           if (isLoggedIn) {
             switch(role){
-              case "patient": return patientHome();
+              case "patient": return MainScreen();
               break;
               case "physician": return physicianHome();
               break;

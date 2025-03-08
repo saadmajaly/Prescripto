@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/Patient/MainScreen.dart';
 import 'package:provider/provider.dart';
 
 import '../../../AuthLogic/AuthProvider.dart';
@@ -35,7 +36,7 @@ class _WebLoginPageState extends State<Login> {
         if (loginSuccessful) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => patientHome()),
+            MaterialPageRoute(builder: (context) => MainScreen()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

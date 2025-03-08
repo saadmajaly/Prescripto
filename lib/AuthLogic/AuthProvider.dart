@@ -13,6 +13,7 @@ class AuthProvider with ChangeNotifier{
       {role = "physician";}
     else if(role == "1")
       {role = "pharmacist";}
+    else{role = "patient";}
     //this statement selects the user using the nationalId
     final query = db.select(db.users)
       ..where((tbl) => tbl.nationalId.equals(nationalId));
