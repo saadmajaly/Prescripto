@@ -12,7 +12,7 @@ class Users extends Table {
   TextColumn get firstName => text().withLength(min: 1, max: 50)();
   TextColumn get lastName => text().withLength(min: 1, max: 50)();
   TextColumn get email => text().withLength(min: 1, max: 100)();
-  TextColumn get phone => text().nullable().withLength(min: 1, max: 20)();
+  TextColumn get phone => text().withLength(min: 1, max: 20)();
   TextColumn get nationalId => text().withLength(min: 1, max: 20)();
   TextColumn get syndicateNumber => text().nullable().withLength(min: 1, max: 20)();
   TextColumn get passwordHash => text()();
@@ -193,8 +193,41 @@ class AppDatabase extends _$AppDatabase {
         ),
   );
 
-  Future<List<User>> getAllUsers() => select(users).get();
+  // ------------------- Users CRUD OPS -----------------------------
 
+  Future<int> createUser(UsersCompanion user) async {
+    return await into(users).insert(user);
+  }
+
+  Future<List<User>> getAllUsers() async {
+    return await select(users).get();
+  }
+
+  Future<User?> getUserByNatID(String NatID) async {
+    return await (select(users)..where((u) => u.nationalId.equals(NatID))).getSingleOrNull();
+  }
+
+  Future<bool> updateUser(User user) async {
+    return await update(users).replace(user);
+  }
+
+  Future<int> deleteUser(int id) async {
+    return await (delete(users)..where((u) => u.id.equals(id))).go();
+  }
+
+  Future<void> updateProfile(String nationalId, String newFirstName, String newLastName, String newEmail, String newPhoneNumber) async{
+    final user = await (select(users)
+      ..where((u) => u.nationalId.equals(nationalId))
+    ).getSingleOrNull();
+
+    if (user != null) {
+      final updatedUser = user.copyWith(firstName: newFirstName, lastName: newLastName, email: newEmail, phone: Value(newPhoneNumber));
+
+      await updateUser(updatedUser);
+    }
+  }
+
+  // ------------------- end of Users CRUD OPS -----------------------------
   AppDatabase.forTesting(DatabaseConnection super.connection);
 
   Future<void> clearDatabase() async {

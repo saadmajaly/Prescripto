@@ -3,6 +3,8 @@ import 'package:prescripto/AuthLogic/AuthProvider.dart';
 import 'package:prescripto/Patient/Auth/Login.dart';
 import 'package:prescripto/data/database.dart';
 
+import 'UpdateProfile.dart';
+
 class Settings extends StatefulWidget {
   const Settings({super.key});
 
@@ -40,7 +42,9 @@ class _Settings extends State<Settings> {
             title: const Text('Update profile'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              // Handle navigation to update profile
+              Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const UpdateProfile()),
+              );
             },
           ),
           const Divider(),

@@ -28,7 +28,7 @@ class AuthProvider with ChangeNotifier{
         // store the most used user info in the session to be used in the next pages and processes
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('userEmail', user.email);
-        await prefs.setInt('userId', user.id);
+        await prefs.setString('NationalID', user.nationalId);
         await prefs.setString('userRole', role);
         return true;
       }
@@ -47,4 +47,8 @@ class AuthProvider with ChangeNotifier{
     return prefs.getBool('isLoggedIn')??false;
   }
 
+  Future<String?> getLoggedInNationalID() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("NationalID");
+  }
 }
