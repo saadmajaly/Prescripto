@@ -23,13 +23,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
     final prefs = new AuthProvider(db);
     User? u = await db.getUserByNatID(await prefs.getLoggedInNationalID() as String);
     _firstNameController.text = await u?.firstName as String;
-    print(_firstNameController.text);
     _lastNameController.text = await u?.lastName as String;
-    print(_lastNameController.text);
     _phoneController.text = await u?.phone as String;
-    print(_phoneController.text);
     _emailController.text = await u?.email as String;
-    print(_emailController.text);
   }
 
   @override
