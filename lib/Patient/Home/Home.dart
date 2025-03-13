@@ -11,7 +11,7 @@ class _Home extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF9F9F9), // Soft background color
+      backgroundColor: Color(0xFFF9F9F9),
       appBar: AppBar(
         title: const Text(
           'Patient home page',
@@ -35,7 +35,7 @@ class _Home extends State<Home> {
                 ),
                 SizedBox(width: 16),
                 Text(
-                  'Hello, Chloe',
+                  'Hello, User',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -50,7 +50,7 @@ class _Home extends State<Home> {
             SizedBox(height: 16),
             Card(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              elevation: 3,
+              elevation: 8,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -59,7 +59,7 @@ class _Home extends State<Home> {
                     child: Image.asset(
                       'assets/HomeMobile.png',
                       width: double.infinity,
-                      height: 160,
+                      height: 180,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -70,12 +70,12 @@ class _Home extends State<Home> {
                       children: [
                         Text(
                           'Lisinopril',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 6),
-                        Text('8:00 AM', style: TextStyle(color: Colors.grey[700], fontSize: 14)),
+                        Text('8:00 AM', style: TextStyle(color: Colors.grey[700], fontSize: 16)),
                         SizedBox(height: 4),
-                        Text('Take with food', style: TextStyle(color: Colors.grey[700], fontSize: 14)),
+                        Text('Take with food', style: TextStyle(color: Colors.grey[700], fontSize: 16)),
                       ],
                     ),
                   ),
@@ -100,8 +100,8 @@ class _Home extends State<Home> {
                       backgroundImage: AssetImage('assets/MedicineLogo.jpg'),
                     ),
                     SizedBox(height: 10),
-                    Text('Metformin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    Text('500mg, 2x daily', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                    Text('Metformin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text('500mg, 2x daily', style: TextStyle(color: Colors.grey[600], fontSize: 14)),
                   ],
                 ),
                 Column(
@@ -111,8 +111,8 @@ class _Home extends State<Home> {
                       backgroundImage: AssetImage('assets/MedicineLogo.jpg'),
                     ),
                     SizedBox(height: 10),
-                    Text('Atorvasta', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    Text('40mg, 1x daily', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                    Text('Atorvasta', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text('40mg, 1x daily', style: TextStyle(color: Colors.grey[600], fontSize: 14)),
                   ],
                 ),
               ],
