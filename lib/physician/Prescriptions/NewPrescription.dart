@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+
+import 'package:prescripto/physician/Patients/Patients.dart';
+import 'package:prescripto/physician/Home/Home.dart';
+
 class NewPrescription extends StatelessWidget {
   const NewPrescription({super.key});
 
@@ -20,7 +24,12 @@ class NewPrescription extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.home),
                   title: const Text('Home'),
-                  onTap: () {},
+                  onTap: () {
+                      Navigator.push(
+                            context,
+                         MaterialPageRoute(builder: (context) =>  physicianHome()),
+                              );
+                  },
                 ),
                 ListTile(
                   leading: const Icon(Icons.add),
@@ -32,7 +41,12 @@ class NewPrescription extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.person),
                   title: const Text('Patients'),
-                  onTap: () {},
+                  onTap: () {
+                     Navigator.push(
+                            context,
+                         MaterialPageRoute(builder: (context) =>    Patients()),
+                              );
+                  },
                 ),
                 ListTile(
                   leading: const Icon(Icons.feedback),
