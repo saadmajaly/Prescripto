@@ -199,6 +199,11 @@ class AppDatabase extends _$AppDatabase {
     return await into(users).insert(user);
   }
 
+  Future<bool> ValidatePassword(String NatId, String HashedPassword) async {
+    final user = await (select(users)..where((u) => u.nationalId.equals(NatId))).getSingleOrNull();
+    return user?.passwordHash == HashedPassword;
+  }
+
   Future<List<User>> getAllUsers() async {
     return await select(users).get();
   }
