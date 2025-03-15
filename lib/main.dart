@@ -36,6 +36,11 @@ void main() async {
     print(user.role + "\n");
     print("-------------------------\n");
   }
+  var prescriptions = await db.GetAllPrescriptions();
+  for( var pres in prescriptions){
+    print(pres.prescriptionId);
+    print("-------------------------\n");
+  }
   // final usersList = await db.select(db.users).get();
   // print(usersList);
   final authProvider = AuthProvider(db);

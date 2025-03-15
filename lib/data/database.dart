@@ -233,6 +233,15 @@ class AppDatabase extends _$AppDatabase {
   }
 
   // ------------------- end of Users CRUD OPS -----------------------------
+
+  // ------------------- Prescriptions CRUD OPS -----------------------------
+
+  Future<List<Prescription>> GetAllPrescriptions() async
+  {
+    return await select(prescriptions).get();
+  }
+
+  // ------------------- end of Prescriptions CRUD OPS -----------------------------
   AppDatabase.forTesting(DatabaseConnection super.connection);
 
   Future<void> clearDatabase() async {
