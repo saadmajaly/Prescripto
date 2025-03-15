@@ -44,7 +44,7 @@ class _WebLoginPageState extends State<WebLoginPage>
           } else if (prefs.getString("userRole") == "pharmacist") {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => pharmacistHome()),
+              MaterialPageRoute(builder: (context) => PharmacistHome()),
             );
           }
         } else {
