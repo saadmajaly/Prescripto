@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
               break;
               case "physician": return physicianHome();
               break;
-              case "pharmacist": return pharmacistHome();
+              case "pharmacist": return PharmacistHome();
               break;
               default: return kIsWeb ? WebLoginPage() : Login();
             }
