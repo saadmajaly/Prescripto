@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:prescripto/AuthLogic/AuthProvider.dart';
 import 'package:prescripto/data/database.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'SettingsBackEnd.dart';
 
@@ -17,6 +18,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   Future<void> loadProfileDate() async {
     final db = new AppDatabase();
@@ -86,6 +88,18 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   border: OutlineInputBorder(),
                 ),
               ),
+              const SizedBox(height: 16),
+
+              // Password Field
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(
+                  labelText: 'Enter your password',
+                  labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                  border: const OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
 
               SizedBox(height: 20,),
               // Buttons Row
@@ -109,9 +123,39 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        var BE = new SettingsBackEnd();
-                        BE.UpdateProfile(_firstNameController.text, _lastNameController.text, _emailController.text, _phoneController.text);
+                      onPressed: () async {
+                        var db = new AppDatabase();
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                        var ValidatePassword = await db.ValidatePassword(prefs.getString('NationalID') as String, _passwordController.text);
+                        if(ValidatePassword == true){
+                          var BE = new SettingsBackEnd();
+                          BE.UpdateProfile(_firstNameController.text, _lastNameController.text, _emailController.text, _phoneController.text);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Profile information was updated successfully'),
+                              behavior: SnackBarBehavior.floating,
+                              margin: EdgeInsets.only(
+                                top: MediaQuery.of(context).padding.top + 10,
+                                left: 10,
+                                right: 10,
+                              ),
+                            ),
+                          );
+                        }
+                        else{
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Please enter the correct password'),
+                              behavior: SnackBarBehavior.floating,
+                              margin: EdgeInsets.only(
+                                top: MediaQuery.of(context).padding.top + 10,
+                                left: 10,
+                                right: 10,
+                              ),
+                            ),
+                          );
+                        }
+
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
