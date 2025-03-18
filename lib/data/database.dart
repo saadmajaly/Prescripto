@@ -241,6 +241,13 @@ class AppDatabase extends _$AppDatabase {
     return await select(prescriptions).get();
   }
 
+  Future<SimpleSelectStatement<$PrescriptionsTable, Prescription>> GetUserPrescriptions(String NationalId) async
+  {
+    final LoggedUser = await (select(users)..where((u) => u.nationalId.equals(NationalId))).getSingle();
+    final query = await select(prescriptions)..where((p) => p.patientId.equals(LoggedUser.id));
+    return query;
+  }
+
   // ------------------- end of Prescriptions CRUD OPS -----------------------------
   AppDatabase.forTesting(DatabaseConnection super.connection);
 
