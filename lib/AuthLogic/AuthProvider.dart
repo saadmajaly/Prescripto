@@ -51,4 +51,14 @@ class AuthProvider with ChangeNotifier{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString("NationalID");
   }
+
+  Future<String?> getLoggedInEmail() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("userEmail");
+  }
+
+  Future<String?> getLoggedInRole() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("userRole");
+  }
 }
