@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/data/database.dart';
+import 'package:prescripto/physician/Home/Home.dart';
+import 'package:prescripto/physician/Patients/PatientsBackEnd.dart';
+import 'package:prescripto/physician/Prescriptions/NewPrescription.dart'; // Ensure the correct path
 
 class Patients extends StatefulWidget {
   @override
@@ -6,26 +10,34 @@ class Patients extends StatefulWidget {
 }
 
 class _PatientsPageState extends State<Patients> {
-  final List<String> patients = [
-    "Stacey Abrams",
-    "Kamala Harris",
-    "Elizabeth Warren",
-    "Nancy Pelosi",
-    "Hillary Clinton"
-  ];
-  List<String> filteredPatients = [];
-  
+  // List to store patients data fetched from the database
+  List<Map<String, dynamic>> patients = [];
+  // List to store filtered patients based on the search query
+  List<Map<String, dynamic>> filteredPatients = [];
+
   @override
   void initState() {
     super.initState();
-    filteredPatients = patients;
+    _fetchPatients();
   }
 
+  /// Fetches patient data from the backend using PatientsService
+  Future<void> _fetchPatients() async {
+    final db = AppDatabase();
+    final result = await PatientsService.fetchPatients(db);
+    setState(() {
+      patients = result;
+      filteredPatients = result; // Initially display all patients
+    });
+  }
+
+  /// Filters the patient list based on the search query
   void _filterPatients(String query) {
     setState(() {
-      filteredPatients = patients
-          .where((patient) => patient.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      filteredPatients = patients.where((patient) {
+        final name = patient['name'].toString().toLowerCase();
+        return name.contains(query.toLowerCase());
+      }).toList();
     });
   }
 
@@ -45,12 +57,20 @@ class _PatientsPageState extends State<Patients> {
                 ListTile(
                   leading: Icon(Icons.home),
                   title: Text('Home'),
-                  onTap: () {},
+                  onTap: () {
+                     Navigator.push(context, MaterialPageRoute(builder: (context) => physicianHome()));
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.edit),
                   title: Text('New Prescriptions'),
-                  onTap: () {},
+                  onTap: () {
+                      Navigator.push(
+                            context,
+                         MaterialPageRoute(builder: (context) =>  NewPrescription()),
+                              );
+
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.people),
@@ -71,18 +91,19 @@ class _PatientsPageState extends State<Patients> {
               ],
             ),
           ),
-          // Main Content
+          // Main Content Area
           Expanded(
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Search field to filter patients
                   TextField(
                     onChanged: _filterPatients,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.search),
-                      hintText: 'Search prescriptions',
+                      hintText: 'Search patients',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                         borderSide: BorderSide.none,
@@ -92,15 +113,17 @@ class _PatientsPageState extends State<Patients> {
                     ),
                   ),
                   SizedBox(height: 16.0),
+                  // List view displaying filtered patients
                   Expanded(
                     child: ListView.builder(
                       itemCount: filteredPatients.length,
                       itemBuilder: (context, index) {
+                        final patient = filteredPatients[index];
                         return ListTile(
                           leading: CircleAvatar(
                             child: Icon(Icons.person),
                           ),
-                          title: Text(filteredPatients[index]),
+                          title: Text(patient['name']),
                         );
                       },
                     ),
