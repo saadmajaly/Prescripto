@@ -1,27 +1,63 @@
 import 'package:prescripto/data/database.dart';
-import 'package:drift/drift.dart';
-import 'package:flutter/foundation.dart'; // For debugPrint
+import 'package:drift/drift.dart'; // For Value<T> and other Drift features
 
-class PatientsService {
-  /// Fetches a list of patients from the Users table where the role is 'patient'
-  static Future<List<Map<String, dynamic>>> fetchPatients(AppDatabase db) async {
-    try {
-      // Use the 'users' table from the database and filter by role 'patient'
-      final query = await (db.select(db.users)
-        ..where((u) => u.role.equals('patient'))) // Make sure the role value matches your DB
-          .get();
+class PatientsBackEnd {
+  final AppDatabase _db;
 
-      // Map each user record to a map containing 'id' and a concatenated 'name'
-      return query.map((user) {
-        return {
-          'id': user.id,
-          'name': '${user.firstName} ${user.lastName}',
-        };
-      }).toList();
-    } catch (e) {
-      debugPrint('Error fetching patients: ${e.toString()}');
-      return [];
+  PatientsBackEnd(this._db);
+
+  /// 1) Retrieve all users.
+  ///    If [role] is provided, only users matching that role are returned.
+  Future<List<User>> getAllUsers({String? role}) async {
+    final query = _db.select(_db.users);
+    if (role != null) {
+      query.where((u) => u.role.equals(role));
     }
+    return query.get();
+  }
+
+  /// 2) Search users by first or last name.
+  ///    Uses a SQL "LIKE" query for partial matches.
+  ///    If [role] is provided, only users with that role are searched.
+  Future<List<User>> searchUsers(String query, {String? role}) async {
+    final pattern = '%$query%';
+    final selectQuery = _db.select(_db.users)
+      ..where((u) => (u.firstName.like(pattern) | u.lastName.like(pattern)));
+    if (role != null) {
+      selectQuery.where((u) => u.role.equals(role));
+    }
+    return selectQuery.get();
+  }
+
+  /// 3) Get a single user by their user ID (primary key).
+  Future<User?> getUserById(int userId) async {
+    return (_db.select(_db.users)
+          ..where((u) => u.id.equals(userId)))
+        .getSingleOrNull();
+  }
+
+  /// 4a) Update a user's phone number.
+  ///     Creates a copy of the [user] with the updated phone field
+  ///     and updates it in the DB.
+  Future<bool> updateUserPhone(User user, String newPhone) async {
+    final updatedUser = user.copyWith(
+      phone: Value(newPhone),
+    );
+    return _db.updateUser(updatedUser);
+  }
+
+  /// 4b) Generic update for a user record.
+  Future<bool> updateUser(User user) async {
+    return _db.updateUser(user);
+  }
+
+  /// 5) Create a new user record in the database.
+  ///    Pass a UsersCompanion containing the new user's details.
+  ///    If [role] is provided, it forces the new record to have that role.
+  Future<int> createUser(UsersCompanion userData, {String? role}) async {
+    if (role != null) {
+      userData = userData.copyWith(role: Value(role));
+    }
+    return _db.createUser(userData);
   }
 }
-

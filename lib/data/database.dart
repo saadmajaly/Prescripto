@@ -304,6 +304,7 @@ class AppDatabase extends _$AppDatabase {
       'Clark', 'Lewis', 'Walker', 'Hall', 'Allen',
       'Young', 'King', 'Wright', 'Scott', 'Green'
     ];
+    
 
     await into(users).insert(
       UsersCompanion.insert(
@@ -381,6 +382,7 @@ class AppDatabase extends _$AppDatabase {
         role: 'pharmacist',
       ),
     );
+
 
     // --- Insert 100 Pharmacists ---
     // for (int i = 0; i < 100; i++) {
