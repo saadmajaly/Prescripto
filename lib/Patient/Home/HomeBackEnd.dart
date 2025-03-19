@@ -3,77 +3,73 @@ import '../../data/database.dart';
 class HomeBackEnd {
   final AppDatabase db = AppDatabase();
 
-  // Fetch user by national ID
-  Future<User?> getUser(String nationalId) async {
-    try {
-      return await db.getUserByNatID(nationalId);
-    } catch (e) {
-      print('Error fetching user: $e');
-      return null;
-    }
+  // Get user name by national ID
+  Future<String?> getUserName(String nationalId) async {
+    final user = await db.getUserByNatID(nationalId);
+    return user?.firstName; // Return the user's first name
   }
 
-  // Fetch prescriptions for a specific patient (user)
-  Future<List<Prescription>> getUserPrescriptions(int userId) async {
-    try {
-      return await (db.select(db.prescriptions)
-        ..where((tbl) => tbl.patientId.equals(userId)))
+  // Get all prescriptions for a user
+  Future<List<Prescription>> getUserPrescriptions(String nationalId) async {
+    final query = await db.GetUserPrescriptions(nationalId);
+    return query.get(); // Fetch prescriptions for the user
+  }
+
+  // Get the next medication reminder (first upcoming prescription)
+  Future<Map<String, dynamic>?> getNextMedicationReminder(String nationalId) async {
+    final prescriptions = await getUserPrescriptions(nationalId);
+    if (prescriptions.isNotEmpty) {
+      final prescription = prescriptions.first; // Get the first prescription
+
+      // Retrieve prescription items for this prescription
+      final items = await (db.select(db.prescriptionItems)
+        ..where((p) => p.prescriptionId.equals(prescription.prescriptionId)))
           .get();
-    } catch (e) {
-      print('Error fetching prescriptions: $e');
-      return [];
-    }
-  }
 
-  // Fetch next medication reminder (for example, based on first prescription)
-  Future<Map<String, dynamic>> getNextMedicationReminder(int userId) async {
-    try {
-      final prescriptions = await getUserPrescriptions(userId);
-      if (prescriptions.isNotEmpty) {
-        // Example logic: take first prescription as reminder (You can enhance this logic)
-        final prescription = prescriptions.first;
-        return {
-          'name': 'Lisinopril', // Example fixed name, can be dynamic later
-          'time': '8:00 AM',   // Example fixed time, can be linked to prescription
-          'instructions': prescription.instructions ?? 'No instructions',
-          'image': 'assets/HomeMobile.png'
-        };
-      } else {
-        return {};
+      if (items.isNotEmpty) {
+        final firstItem = items.first;
+        // Retrieve medication details
+        final medication = await (db.select(db.medications)
+          ..where((m) => m.medicationId.equals(firstItem.medicationId)))
+            .getSingleOrNull();
+
+        if (medication != null) {
+          return {
+            'name': medication.name,
+            'time': '8:00 AM', // Placeholder for scheduling information
+            'instructions': prescription.instructions ?? 'No instructions',
+            'image': 'assets/HomeMobile.png'
+          };
+        }
       }
-    } catch (e) {
-      print('Error fetching medication reminder: $e');
-      return {};
     }
+    return null;
   }
 
-  // Fetch active prescriptions as medicine info (You can customize as needed)
-  Future<List<Map<String, String>>> getActiveMedications(int userId) async {
-    try {
-      final prescriptionItems = await (db.select(db.prescriptionItems)
-        ..where((tbl) => tbl.prescriptionId.isInQuery(
-            db.select(db.prescriptions)..where((p) => p.patientId.equals(userId)))))
-          .get();
+  // Get active medications from the user's prescriptions
+  Future<List<Map<String, String>>> getActiveMedications(String nationalId) async {
+    final prescriptions = await getUserPrescriptions(nationalId);
+    final List<Map<String, String>> activeMeds = [];
 
-      final medications = <Map<String, String>>[];
+    for (var prescription in prescriptions) {
+      final prescriptionItems = await (db.select(db.prescriptionItems)
+        ..where((tbl) => tbl.prescriptionId.equals(prescription.prescriptionId)))
+          .get();
 
       for (var item in prescriptionItems) {
         final medication = await (db.select(db.medications)
           ..where((m) => m.medicationId.equals(item.medicationId)))
             .getSingleOrNull();
+
         if (medication != null) {
-          medications.add({
+          activeMeds.add({
             'name': medication.name,
-            'dosage': item.dosage ?? 'No dosage',
-            'image': 'assets/MedicineLogo.jpg' // Static image, can be dynamic if available
+            'dosage': item.dosage ?? 'No dosage available',
+            'image': 'assets/MedicineLogo.jpg'
           });
         }
       }
-
-      return medications;
-    } catch (e) {
-      print('Error fetching active medications: $e');
-      return [];
     }
+    return activeMeds;
   }
 }
