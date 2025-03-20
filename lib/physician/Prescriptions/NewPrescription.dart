@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/physician/Feedback/Feedback.dart';
 import 'package:prescripto/physician/Patients/Patients.dart';
 import 'package:prescripto/physician/Home/Home.dart';
 import 'package:prescripto/physician/Prescriptions/NewPrescriptionBackEnd.dart';
@@ -173,7 +174,9 @@ class _NewPrescriptionState extends State<NewPrescription> {
           ListTile(
             leading: const Icon(Icons.feedback),
             title: const Text('Feedback'),
-            onTap: () {},
+            onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => FeedbackScreen()));
+            },
           ),
           ListTile(
             leading: const Icon(Icons.help),
