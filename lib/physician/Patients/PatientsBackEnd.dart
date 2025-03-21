@@ -2,18 +2,25 @@ import 'package:prescripto/data/database.dart';
 import 'package:drift/drift.dart'; // For Value<T> and other Drift features
 
 class PatientsBackEnd {
-  final AppDatabase _db;
+  final AppDatabase db;
 
-  PatientsBackEnd(this._db);
+  PatientsBackEnd(this.db);
+
+  Future<List<User>> getAllPatients() async {
+    final query = db.select(db.users);
+    // ..where((u) => u.role.equals('patient'))
+    return await query.get();
+  }
 
   /// 1) Retrieve all users.
   ///    If [role] is provided, only users matching that role are returned.
+
   Future<List<User>> getAllUsers({String? role}) async {
-    final query = _db.select(_db.users);
+    final query = await db.select(db.users);
     if (role != null) {
       query.where((u) => u.role.equals(role));
     }
-    return query.get();
+    return await query.get();
   }
 
   /// 2) Search users by first or last name.
@@ -21,7 +28,7 @@ class PatientsBackEnd {
   ///    If [role] is provided, only users with that role are searched.
   Future<List<User>> searchUsers(String query, {String? role}) async {
     final pattern = '%$query%';
-    final selectQuery = _db.select(_db.users)
+    final selectQuery = db.select(db.users)
       ..where((u) => (u.firstName.like(pattern) | u.lastName.like(pattern)));
     if (role != null) {
       selectQuery.where((u) => u.role.equals(role));
@@ -31,7 +38,7 @@ class PatientsBackEnd {
 
   /// 3) Get a single user by their user ID (primary key).
   Future<User?> getUserById(int userId) async {
-    return (_db.select(_db.users)
+    return (db.select(db.users)
           ..where((u) => u.id.equals(userId)))
         .getSingleOrNull();
   }
@@ -43,12 +50,12 @@ class PatientsBackEnd {
     final updatedUser = user.copyWith(
       phone: Value(newPhone),
     );
-    return _db.updateUser(updatedUser);
+    return db.updateUser(updatedUser);
   }
 
   /// 4b) Generic update for a user record.
   Future<bool> updateUser(User user) async {
-    return _db.updateUser(user);
+    return db.updateUser(user);
   }
 
   /// 5) Create a new user record in the database.
@@ -58,6 +65,6 @@ class PatientsBackEnd {
     if (role != null) {
       userData = userData.copyWith(role: Value(role));
     }
-    return _db.createUser(userData);
+    return db.createUser(userData);
   }
 }

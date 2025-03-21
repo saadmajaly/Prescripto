@@ -34,8 +34,7 @@ class _PatientsPageState extends State<Patients> {
       isLoading = true;
     });
     try {
-      // Use the updated backend method with role filtering.
-      final allPatients = await _patientsBackend.getAllUsers(role: 'patient');
+      final allPatients = await _patientsBackend.getAllPatients();
       debugPrint('Fetched ${allPatients.length} patient(s).');
       for (var p in allPatients) {
         debugPrint('Patient: ${p.firstName} ${p.lastName}, role: ${p.role}');
