@@ -170,7 +170,13 @@ class BlockchainTransactions extends Table {
   BlockchainTransactions
 ])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase([QueryExecutor? e])
+
+
+  // Create a private static instance
+  static final AppDatabase _instance = AppDatabase._internal();
+
+  // Private named constructor
+  AppDatabase._internal([QueryExecutor? e])
       : super(
     e ??
         driftDatabase(
@@ -193,11 +199,21 @@ class AppDatabase extends _$AppDatabase {
         ),
   );
 
+  // Factory constructor that always returns the same instance.
+  factory AppDatabase() => _instance;
+
+  // ... (rest of your methods remain unchanged)
+
+  @override
+  int get schemaVersion => 1;
+
   // ------------------- Users CRUD OPS -----------------------------
 
   Future<int> createUser(UsersCompanion user) async {
     return await into(users).insert(user);
   }
+
+
 
   Future<bool> ValidatePassword(String NatId, String HashedPassword) async {
     final user = await (select(users)..where((u) => u.nationalId.equals(NatId))).getSingleOrNull();
@@ -206,6 +222,10 @@ class AppDatabase extends _$AppDatabase {
 
   Future<List<User>> getAllUsers() async {
     return await select(users).get();
+  }
+
+  Future<List<User>> getAllPatients() async {
+    return await (select(users)..where((u) => u.role.equals("patient"))).get();
   }
 
   Future<User?> getUserByNatID(String NatID) async {
@@ -596,7 +616,4 @@ class AppDatabase extends _$AppDatabase {
       );
     }
   }
-
-  @override
-  int get schemaVersion => 1;
 }

@@ -11,11 +11,6 @@ class Patients extends StatefulWidget {
 }
 
 class _PatientsPageState extends State<Patients> {
-  // Backend service to interact with the DB.
-  late final PatientsBackEnd _patientsBackend;
-
-  // 'patients' holds the full list from the DB,
-  // 'filteredPatients' holds the current search results.
   List<Map<String, dynamic>> patients = [];
   List<Map<String, dynamic>> filteredPatients = [];
   bool isLoading = false;
@@ -23,44 +18,38 @@ class _PatientsPageState extends State<Patients> {
   @override
   void initState() {
     super.initState();
-    // Obtain your AppDatabase instance (adjust as needed)
-    final db = AppDatabase();
-    _patientsBackend = PatientsBackEnd(db);
-    _fetchPatients();
+    FetchPatients();
   }
 
   /// Fetches all users with role 'patient' from the DB.
-  Future<void> _fetchPatients() async {
+  Future<void> FetchPatients() async {
     setState(() {
       isLoading = true;
     });
-    try {
-      final allPatients = await _patientsBackend.getAllPatients();
-      debugPrint('Fetched ${allPatients.length} patient(s).');
-      for (var p in allPatients) {
-        debugPrint('Patient: ${p.firstName} ${p.lastName}, role: ${p.role}');
-      }
 
-      // Map each User object to a simpler Map for display purposes.
-      final mappedPatients = allPatients.map((user) {
+    final db = AppDatabase();
+    try {
+      final userList = await db.getAllPatients();
+      final patientsList = userList.map((user) {
         return {
           'id': user.id,
           'name': '${user.firstName} ${user.lastName}',
           'phone': user.phone,
         };
       }).toList();
-
       setState(() {
-        patients = mappedPatients;
-        filteredPatients = mappedPatients; // Initially display all
+        patients = patientsList;
+        filteredPatients = patientsList;
+        isLoading = false;
       });
+      print('Fetched ${patientsList.length} patients');
     } catch (error) {
-      debugPrint('Error fetching patients: $error');
-    } finally {
+      debugPrint("Error fetching patients: $error");
       setState(() {
         isLoading = false;
       });
     }
+
   }
 
   /// Filters the patient list using a backend search (if query is provided)
@@ -75,9 +64,10 @@ class _PatientsPageState extends State<Patients> {
         isLoading = true;
       });
       try {
+        final PatientBE = new PatientsBackEnd();
         // Call the updated backend search function with role filtering.
         final searchResults =
-            await _patientsBackend.searchUsers(query, role: 'patient');
+            await PatientBE.searchUsers(query, role: 'patient');
         final mappedResults = searchResults.map((user) {
           return {
             'id': user.id,

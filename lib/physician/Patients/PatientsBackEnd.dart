@@ -2,14 +2,10 @@ import 'package:prescripto/data/database.dart';
 import 'package:drift/drift.dart'; // For Value<T> and other Drift features
 
 class PatientsBackEnd {
-  final AppDatabase db;
-
-  PatientsBackEnd(this.db);
+  final db = AppDatabase();
 
   Future<List<User>> getAllPatients() async {
-    final query = db.select(db.users);
-    // ..where((u) => u.role.equals('patient'))
-    return await query.get();
+    return await db.getAllPatients();
   }
 
   /// 1) Retrieve all users.
