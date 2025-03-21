@@ -268,6 +268,18 @@ class AppDatabase extends _$AppDatabase {
     return query;
   }
 
+  Future<bool> CreateNewPrescription(Prescription Prescription, String PatientNationalId) async {
+    var user = await getUserByNatID(PatientNationalId);
+
+    if(user == Null) return false;
+
+    final updatedPrescription = Prescription.copyWith(
+      patientId: user?.id,
+    );
+    await into(prescriptions).insert(Prescription);
+    return true;
+  }
+
   // ------------------- end of Prescriptions CRUD OPS -----------------------------
   AppDatabase.forTesting(DatabaseConnection super.connection);
 
