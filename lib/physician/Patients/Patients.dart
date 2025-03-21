@@ -64,10 +64,10 @@ class _PatientsPageState extends State<Patients> {
         isLoading = true;
       });
       try {
-        final PatientBE = new PatientsBackEnd();
+        final db = new AppDatabase();
         // Call the updated backend search function with role filtering.
         final searchResults =
-            await PatientBE.searchUsers(query, role: 'patient');
+            await db.searchUsers(query, role: 'patient');
         final mappedResults = searchResults.map((user) {
           return {
             'id': user.id,

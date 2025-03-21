@@ -252,6 +252,16 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  Future<List<User>> searchUsers(String query, {String? role}) async {
+    final pattern = '%$query%';
+    final selectQuery = select(users)
+      ..where((u) => (u.firstName.like(pattern) | u.lastName.like(pattern)));
+    if (role != null) {
+      selectQuery.where((u) => u.role.equals(role));
+    }
+    return selectQuery.get();
+  }
+
   // ------------------- end of Users CRUD OPS -----------------------------
 
   // ------------------- Prescriptions CRUD OPS -----------------------------
@@ -281,6 +291,20 @@ class AppDatabase extends _$AppDatabase {
   }
 
   // ------------------- end of Prescriptions CRUD OPS -----------------------------
+
+  // ------------------- Medicine CRUD OPS -----------------------------
+
+  Future<List<Medication>> searchMedications(String query) async {
+    // Create a pattern that matches any occurrence of the query
+    final pattern = '%$query%';
+
+    // Build and execute the query using Drift's query builder.
+    return await (select(medications)
+      ..where((m) => m.name.like(pattern) | (m.description.like(pattern)))
+    ).get();
+  }
+
+  // ------------------- end of Medicine CRUD OPS -----------------------------
   AppDatabase.forTesting(DatabaseConnection super.connection);
 
   Future<void> clearDatabase() async {
