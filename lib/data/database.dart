@@ -290,6 +290,21 @@ class AppDatabase extends _$AppDatabase {
     return true;
   }
 
+  Future<Prescription> GetPrescription(int ID) async{
+    return await (select(prescriptions)..where((p) => p.prescriptionId.equals(ID))).getSingle();
+  }
+
+  Future<List<PrescriptionItem>> GetPrescriptionItems(int ID) async{
+    return await (select(prescriptionItems)..where((item) => item.prescriptionId.equals(ID))).get();
+  }
+
+  Future<Medication> GetMedicationInfo(int ID) async{
+    return await (select(medications)..where((med) => med.medicationId.equals(ID))).getSingle();
+  }
+
+
+
+  //    var Items = await select(prescriptionItems)..where((item) => item.prescriptionId.equals(ID));
   // ------------------- end of Prescriptions CRUD OPS -----------------------------
 
   // ------------------- Medicine CRUD OPS -----------------------------

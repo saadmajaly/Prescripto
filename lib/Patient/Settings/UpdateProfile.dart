@@ -3,6 +3,7 @@ import 'package:prescripto/AuthLogic/AuthProvider.dart';
 import 'package:prescripto/data/database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Prescriptions/SinglePrescription.dart';
 import 'SettingsBackEnd.dart';
 
 class UpdateProfile extends StatefulWidget {
@@ -109,6 +110,14 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     child: OutlinedButton(
                       onPressed: () {
                         // Handle cancel logic
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SinglePrescription(
+                              prescriptionId: 4305, // Replace 123 with the actual ID you want to pass
+                            ),
+                          ),
+                        );
                       },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.black54, // Text color
