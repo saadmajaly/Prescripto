@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:prescripto/physician/Feedback/Feedback.dart';
 import 'package:prescripto/physician/Patients/Patients.dart';
 import 'package:prescripto/physician/Prescriptions/NewPrescription.dart';
+import 'package:prescripto/physician/Home/HomeBackEnd.dart';
+import 'package:prescripto/data/database.dart';
 
-
-
-// import '../../AuthLogic/AuthProvider.dart';
 class physicianHome extends StatefulWidget {
   const physicianHome({super.key});
 
@@ -14,30 +13,47 @@ class physicianHome extends StatefulWidget {
 }
 
 class _physicianHome extends State<physicianHome> {
-  final List<Map<String, String>> prescriptions = [
-    {'id': '#220365', 'date': 'Created 2 days ago'},
-    {'id': '#193625', 'date': 'Created 4 days ago'},
-    {'id': '#186325', 'date': 'Created 1 week ago'},
-    {'id': '#175635', 'date': 'Created 3 weeks ago'},
-    {'id': '#171963', 'date': 'Created 1 month ago'},
-  ];
-    
+  late HomeBackEnd controller;
+  List<PrescriptionSummary> allPrescriptions = [];
+  List<PrescriptionSummary> filteredPrescriptions = [];
   String searchQuery = "";
 
-  
-    @override
+  @override
+  void initState() {
+    super.initState();
+    controller = HomeBackEnd(AppDatabase());
+    loadData();
+  }
+
+  Future<void> loadData() async {
+    // Replace with real physician national ID from auth
+    const physicianNatId = '8888888888';
+    allPrescriptions = await controller.loadPrescriptions(physicianNatId);
+    setState(() {
+      filteredPrescriptions = allPrescriptions;
+    });
+  }
+
+  void onSearch(String query) {
+    setState(() {
+      searchQuery = query.toLowerCase();
+      filteredPrescriptions = controller.filterPrescriptions(allPrescriptions, query);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-     appBar: AppBar(
-  backgroundColor: Colors.white, // Set AppBar background to white
-  automaticallyImplyLeading: false,
-  centerTitle: true,
-  title: const Text(
-    'Your Prescriptions',
-    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black), // Ensure text is visible on white
-  ),
-),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: const Text(
+          'Your Prescriptions',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+      ),
       drawer: Drawer(
         child: Container(
           color: Colors.white,
@@ -58,17 +74,32 @@ class _physicianHome extends State<physicianHome> {
               ListTile(
                 leading: const Icon(Icons.note_add),
                 title: const Text('New Prescription'),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => NewPrescription()),
+                  );
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.people),
                 title: const Text('Patients'),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Patients()),
+                  );
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.feedback),
                 title: const Text('Feedback'),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => FeedbackScreen()),
+                  );
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.help),
@@ -89,41 +120,40 @@ class _physicianHome extends State<physicianHome> {
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
-                   
                     ListTile(
                       leading: const Icon(Icons.home),
                       title: const Text('Home'),
                       onTap: () {},
                     ),
-                 ListTile(
-                       leading: const Icon(Icons.note_add),
-                     title: const Text('New Prescription'),
-                           onTap: () {
-                         Navigator.push(
-                            context,
-                         MaterialPageRoute(builder: (context) =>  NewPrescription()),
-                              );
-                              },
-                                                                                                                                                                                                                                                                                                   ),
-
+                    ListTile(
+                      leading: const Icon(Icons.note_add),
+                      title: const Text('New Prescription'),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => NewPrescription()),
+                        );
+                      },
+                    ),
                     ListTile(
                       leading: const Icon(Icons.people),
                       title: const Text('Patients'),
-                      onTap: () {   Navigator.push(
-                            context,
-                         MaterialPageRoute(builder: (context) =>    Patients()),
-                              );},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Patients()),
+                        );
+                      },
                     ),
                     ListTile(
                       leading: const Icon(Icons.feedback),
                       title: const Text('Feedback'),
                       onTap: () {
-                         Navigator.push(
-                            context,
-                         MaterialPageRoute(builder: (context) =>    FeedbackScreen()),
-                              );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FeedbackScreen()),
+                        );
                       },
-
                     ),
                     ListTile(
                       leading: const Icon(Icons.help),
@@ -148,27 +178,21 @@ class _physicianHome extends State<physicianHome> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        searchQuery = value.toLowerCase();
-                      });
-                    },
+                    onChanged: onSearch,
                   ),
                   const SizedBox(height: 20),
                   Expanded(
                     child: ListView.builder(
-                      itemCount: prescriptions.length,
+                      itemCount: filteredPrescriptions.length,
                       itemBuilder: (context, index) {
-                        final prescription = prescriptions[index];
-                        if (searchQuery.isNotEmpty &&
-                            !prescription['id']!.toLowerCase().contains(searchQuery)) {
-                          return Container();
-                        }
+                        final prescription = filteredPrescriptions[index];
                         return Card(
                           child: ListTile(
                             leading: const Icon(Icons.receipt_long, color: Colors.blue),
-                            title: Text(prescription['id']!),
-                            subtitle: Text(prescription['date']!),
+                            title: Text("#${prescription.id}"),
+                            subtitle: Text(
+                              '${prescription.formattedTime}\nPatient: ${prescription.patientName ?? 'N/A'}',
+                            ),
                             onTap: () {
                               // Navigate to details page
                             },
