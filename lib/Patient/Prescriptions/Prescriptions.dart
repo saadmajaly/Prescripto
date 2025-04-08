@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../AuthLogic/AuthProvider.dart';
+import '../../data/database.dart';
 import 'PrescriptionsBackEnd.dart';
 
 class Prescriptions extends StatefulWidget {
@@ -21,7 +23,9 @@ class _PrescriptionsState extends State<Prescriptions> {
   }
 
   Future<void> _fetchPrescriptions() async {
-    const String nationalId = "9999999999"; // Replace with real user ID
+    final AppDatabase db = AppDatabase();
+    var authProvider = new AuthProvider(db);
+    var nationalId = authProvider.getLoggedInNationalID() as String; // Replace with real user ID
     final prescriptions = await backend.getPrescriptions(nationalId);
     setState(() {
       activePrescriptions = prescriptions["active"]!;

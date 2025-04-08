@@ -7,7 +7,7 @@ class HomeBackEnd {
   Future<String?> getUserName(String nationalId) async {
     final user = await db.getUserByNatID(nationalId);
     return user?.firstName; // Return the user's first name
-  }
+  } 
 
   // Get all prescriptions for a user
   Future<List<Prescription>> getUserPrescriptions(String nationalId) async {
