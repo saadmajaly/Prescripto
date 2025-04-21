@@ -1,212 +1,155 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/CommonWeb/login_screen.dart';
 import 'package:prescripto/physician/Feedback/Feedback.dart';
 import 'package:prescripto/physician/Patients/Patients.dart';
 import 'package:prescripto/physician/Prescriptions/NewPrescription.dart';
 import 'package:prescripto/physician/Home/HomeBackEnd.dart';
 import 'package:prescripto/data/database.dart';
 
-class physicianHome extends StatefulWidget {
+class physicianHome extends StatelessWidget {
   const physicianHome({super.key});
-
-  @override
-  _physicianHome createState() => _physicianHome();
-}
-
-class _physicianHome extends State<physicianHome> {
-  late HomeBackEnd controller;
-  List<PrescriptionSummary> allPrescriptions = [];
-  List<PrescriptionSummary> filteredPrescriptions = [];
-  String searchQuery = "";
-
-  @override
-  void initState() {
-    super.initState();
-    controller = HomeBackEnd(AppDatabase());
-    loadData();
-  }
-
-  Future<void> loadData() async {
-    // Replace with real physician national ID from auth
-    const physicianNatId = '8888888888';
-    allPrescriptions = await controller.loadPrescriptions(physicianNatId);
-    setState(() {
-      filteredPrescriptions = allPrescriptions;
-    });
-  }
-
-  void onSearch(String query) {
-    setState(() {
-      searchQuery = query.toLowerCase();
-      filteredPrescriptions = controller.filterPrescriptions(allPrescriptions, query);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: const Text(
-          'Your Prescriptions',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-      ),
-      drawer: Drawer(
-        child: Container(
-          color: Colors.white,
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-                child: SizedBox.shrink(),
-              ),
-              ListTile(
-                leading: const Icon(Icons.home),
-                title: const Text('Home'),
-                onTap: () {},
-              ),
-              ListTile(
-                leading: const Icon(Icons.note_add),
-                title: const Text('New Prescription'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => NewPrescription()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.people),
-                title: const Text('Patients'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Patients()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.feedback),
-                title: const Text('Feedback'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => FeedbackScreen()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.help),
-                title: const Text('Help'),
-                onTap: () {},
-              ),
-            ],
-          ),
-        ),
-      ),
+ backgroundColor: const Color(0xFFF5F5F5),
+
       body: Row(
         children: [
+          // Sidebar Menu
           Container(
-            width: 250,
-            child: Drawer(
-              child: Container(
-                color: Colors.white,
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: [
-                    ListTile(
-                      leading: const Icon(Icons.home),
-                      title: const Text('Home'),
-                      onTap: () {},
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.note_add),
-                      title: const Text('New Prescription'),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => NewPrescription()),
-                        );
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.people),
-                      title: const Text('Patients'),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Patients()),
-                        );
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.feedback),
-                      title: const Text('Feedback'),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => FeedbackScreen()),
-                        );
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.help),
-                      title: const Text('Help'),
-                      onTap: () {},
-                    ),
-                  ],
+            width: 200,
+        color: const Color.fromARGB(255, 0, 150, 136),  // #009688
+
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.home),
+                  title: Text('Home'),
+                  onTap: () {
+                  },
                 ),
-              ),
+                ListTile(
+                  leading: Icon(Icons.edit),
+                  title: Text('New Prescriptions'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => NewPrescription()),
+                    );
+                  },
+                ),
+              ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Patients'),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Patients()));
+            },
+          ),
+                  
+                
+                ListTile(
+                  leading: Icon(Icons.feedback),
+                  title: Text('Feedback'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => FeedbackScreen()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.help),
+                  title: Text('Help'),
+                  onTap: () {},
+                ),
+                ListTile(
+                  leading: Icon(Icons.logout_outlined),
+                  title: Text('Log out'),
+                  onTap: () {
+                    // Clear user data if needed
+                    // Then navigate to login screen
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => WebLoginPage ()),
+                      (route) => false,
+                    );
+                  },
+                ),
+              ],
             ),
           ),
+
+          // Main Content
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Search prescriptions',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                    onChanged: onSearch,
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Dashboard', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                     
+                    ],
                   ),
+
                   const SizedBox(height: 20),
+
+
+                  const SizedBox(height: 20),
+
+                  // Charts and Task
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: filteredPrescriptions.length,
-                      itemBuilder: (context, index) {
-                        final prescription = filteredPrescriptions[index];
-                        return Card(
-                          child: ListTile(
-                            leading: const Icon(Icons.receipt_long, color: Colors.blue),
-                            title: Text("#${prescription.id}"),
-                            subtitle: Text(
-                              '${prescription.formattedTime}\nPatient: ${prescription.patientName ?? 'N/A'}',
-                            ),
-                            onTap: () {
-                              // Navigate to details page
-                            },
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Left side with Progress and Skills
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            children: [
+                              _buildPlaceholder(height: 180, label: 'Progress Graph'),
+                           
+                            ],
                           ),
-                        );
-                      },
+                        ),
+                        const SizedBox(width: 20),
+                        // Right side with Productivity and Tasks
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            children: [
+                              _buildPlaceholder(height: 180, label: 'Productivity Chart'),
+                           
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
-          ),
+          )
         ],
       ),
     );
   }
-}
+
+  }
+
+  Widget _buildPlaceholder({required double height, required String label}) {
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Center(child: Text(label, style: const TextStyle(color: Colors.grey))),
+    );
+  }
+

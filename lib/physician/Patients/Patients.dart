@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/CommonWeb/login_screen.dart';
 import 'package:prescripto/data/database.dart'; // <-- Adjust to your actual path
 import 'package:prescripto/physician/Feedback/Feedback.dart';
 import 'package:prescripto/physician/Home/Home.dart';
@@ -88,16 +89,18 @@ class _PatientsPageState extends State<Patients> {
     }
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+ backgroundColor: const Color(0xFFF5F5F5),
+
       body: Row(
         children: [
           // Sidebar Menu
           Container(
             width: 200,
-            color: Colors.grey[200],
+        color: const Color.fromARGB(255, 0, 150, 136),  // #009688
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -105,10 +108,7 @@ class _PatientsPageState extends State<Patients> {
                   leading: Icon(Icons.home),
                   title: Text('Home'),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => physicianHome()),
-                    );
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => physicianHome()));
                   },
                 ),
                 ListTile(
@@ -121,12 +121,15 @@ class _PatientsPageState extends State<Patients> {
                     );
                   },
                 ),
-                ListTile(
-                  leading: Icon(Icons.people),
-                  title: Text('Patients'),
-                  selected: true,
-                  onTap: () {},
-                ),
+              ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Patients'),
+            onTap: () {
+             
+            },
+          ),
+                  
+                
                 ListTile(
                   leading: Icon(Icons.feedback),
                   title: Text('Feedback'),
@@ -141,6 +144,19 @@ class _PatientsPageState extends State<Patients> {
                   leading: Icon(Icons.help),
                   title: Text('Help'),
                   onTap: () {},
+                ),
+                ListTile(
+                  leading: Icon(Icons.logout_outlined),
+                  title: Text('Log out'),
+                  onTap: () {
+                    // Clear user data if needed
+                    // Then navigate to login screen
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => WebLoginPage ()),
+                      (route) => false,
+                    );
+                  },
                 ),
               ],
             ),

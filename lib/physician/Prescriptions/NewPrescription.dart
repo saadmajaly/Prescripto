@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/CommonWeb/login_screen.dart';
 import 'package:prescripto/physician/Feedback/Feedback.dart';
 import 'package:prescripto/physician/Patients/Patients.dart';
 import 'package:prescripto/physician/Home/Home.dart';
@@ -79,7 +80,7 @@ class _NewPrescriptionState extends State<NewPrescription> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+       backgroundColor: const Color(0xFFF5F5F5),
       body: Row(
         children: [
           _buildSidebar(context),
@@ -145,7 +146,7 @@ class _NewPrescriptionState extends State<NewPrescription> {
   Widget _buildSidebar(BuildContext context) {
     return Container(
       width: 250,
-      color: Colors.grey.shade100,
+   color: const Color.fromARGB(255, 0, 150, 136),  // #009688
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -183,6 +184,19 @@ class _NewPrescriptionState extends State<NewPrescription> {
             title: const Text('Help'),
             onTap: () {},
           ),
+          ListTile(
+                  leading: Icon(Icons.logout_outlined),
+                  title: Text('Log out'),
+                  onTap: () {
+                    // Clear user data if needed
+                    // Then navigate to login screen
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => WebLoginPage ()),
+                      (route) => false,
+                    );
+                  },
+                ),
         ],
       ),
     );
