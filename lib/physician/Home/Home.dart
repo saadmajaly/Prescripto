@@ -12,27 +12,24 @@ class physicianHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
- backgroundColor: const Color(0xFFF5F5F5),
-
+      backgroundColor: const Color(0xFFF5F5F5),
       body: Row(
         children: [
           // Sidebar Menu
           Container(
             width: 200,
-        color: const Color.fromARGB(255, 0, 150, 136),  // #009688
-
+            color: const Color.fromARGB(255, 0, 150, 136), // #009688
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ListTile(
-                  leading: Icon(Icons.home),
-                  title: Text('Home'),
-                  onTap: () {
-                  },
+                  leading: const Icon(Icons.home),
+                  title: const Text('Home'),
+                  onTap: () {},
                 ),
                 ListTile(
-                  leading: Icon(Icons.edit),
-                  title: Text('New Prescriptions'),
+                  leading: const Icon(Icons.edit),
+                  title: const Text('New Prescriptions'),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -40,18 +37,19 @@ class physicianHome extends StatelessWidget {
                     );
                   },
                 ),
-              ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text('Patients'),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => Patients()));
-            },
-          ),
-                  
-                
                 ListTile(
-                  leading: Icon(Icons.feedback),
-                  title: Text('Feedback'),
+                  leading: const Icon(Icons.person),
+                  title: const Text('Patients'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Patients()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.feedback),
+                  title: const Text('Feedback'),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -60,19 +58,17 @@ class physicianHome extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.help),
-                  title: Text('Help'),
+                  leading: const Icon(Icons.help),
+                  title: const Text('Help'),
                   onTap: () {},
                 ),
                 ListTile(
-                  leading: Icon(Icons.logout_outlined),
-                  title: Text('Log out'),
+                  leading: const Icon(Icons.logout_outlined),
+                  title: const Text('Log out'),
                   onTap: () {
-                    // Clear user data if needed
-                    // Then navigate to login screen
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => WebLoginPage ()),
+                      MaterialPageRoute(builder: (context) => WebLoginPage()),
                       (route) => false,
                     );
                   },
@@ -89,67 +85,161 @@ class physicianHome extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header
-                  Row(
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Dashboard', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                     
+                      Text(
+                        'Dashboard',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
 
                   const SizedBox(height: 20),
 
+                  // ==== STATISTIC CARD ROW ====
+                  const Row(
+                    children: [
+                      StatCard(
+                        title: 'Number of patient',
+                        value: '222',
+                        footnote: 'as of today',
+                        topRightIcon: Icons.people,
+                      ),
+                    ],
+                  ),
 
                   const SizedBox(height: 20),
 
-                  // Charts and Task
+                  // Charts or other content
                   Expanded(
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Left side with Progress and Skills
                         Expanded(
                           flex: 2,
-                          child: Column(
-                            children: [
-                              _buildPlaceholder(height: 180, label: 'Progress Graph'),
-                           
-                            ],
+                          child: _buildPlaceholder(
+                            height: 180,
+                            label: 'Progress Graph',
                           ),
                         ),
                         const SizedBox(width: 20),
-                        // Right side with Productivity and Tasks
                         Expanded(
                           flex: 2,
-                          child: Column(
-                            children: [
-                              _buildPlaceholder(height: 180, label: 'Productivity Chart'),
-                           
-                            ],
+                          child: _buildPlaceholder(
+                            height: 180,
+                            label: 'Productivity Chart',
                           ),
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
+}
 
-  }
+/// Placeholder for charts
+Widget _buildPlaceholder({
+  required double height,
+  required String label,
+}) {
+  return Container(
+    height: height,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Center(
+      child: Text(
+        label,
+        style: const TextStyle(color: Colors.grey),
+      ),
+    ),
+  );
+}
 
-  Widget _buildPlaceholder({required double height, required String label}) {
+/// Simplified StatCard (only title, value, footnote)
+class StatCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final String footnote;
+  final IconData topRightIcon;
+
+  const StatCard({
+    Key? key,
+    required this.title,
+    required this.value,
+    required this.footnote,
+    required this.topRightIcon,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      height: height,
+      width: 180,
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Center(child: Text(label, style: const TextStyle(color: Colors.grey))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title + icon
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Icon(topRightIcon, size: 20, color: Colors.grey[400]),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // Big value
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Footnote
+          Text(
+            footnote,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
     );
   }
-
+}
