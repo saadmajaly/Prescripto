@@ -1,9 +1,35 @@
-// import '../../AuthLogic/AuthProvider.dart';
 import 'package:flutter/material.dart';
 
+import 'package:prescripto/Pharmacist/Prescriptions/ReviewPrescription.dart';
 
-class PharmacistHome extends StatelessWidget {
+import '../../data/database.dart';
+import 'HomeBackEnd.dart';
+
+
+class PharmacistHome extends StatefulWidget {
   const PharmacistHome({super.key});
+
+  @override
+  _PharmacistHomeState createState() => _PharmacistHomeState();
+}
+
+class _PharmacistHomeState extends State<PharmacistHome> {
+  List<dynamic> prescriptions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPrescriptions();
+  }
+
+  Future<void> fetchPrescriptions() async {
+    final homeBackend = HomeBackend(AppDatabase());
+
+    final prescriptions = await homeBackend.getPendingPrescriptions();
+    setState(() {
+      this.prescriptions = prescriptions;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +47,13 @@ class PharmacistHome extends StatelessWidget {
                   padding: EdgeInsets.all(20),
                   child: Text(
                     'Prescripto',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 24),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                   ),
                 ),
-                const SizedBox(height: 20),
                 _buildSidebarItem('Home', isActive: true),
                 _buildSidebarItem('Inventory'),
-                _buildSidebarItem('Reports'),
+                _buildSidebarItem('Feedback'),
+                _buildSidebarItem('Help'),
               ],
             ),
           ),
@@ -37,12 +62,12 @@ class PharmacistHome extends StatelessWidget {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
-              child: ListView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'Prescriptions',
-                    style:
-                    TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   const Text(
@@ -51,25 +76,23 @@ class PharmacistHome extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
 
-                  // Pending Prescriptions
-                  _buildPrescriptionCard('Amoxicillin', '100 mg, 1 tablet, oral, twice daily for 10 days', 'Review'),
-                  _buildPrescriptionCard('Ibuprofen', '200 mg, 1 tablet, oral, twice daily for 10 days', 'Review'),
-                  _buildPrescriptionCard('Clindamycin', '5 mL, 1 bottle, topical, twice daily for 7 days', 'Review'),
-
-                  const SizedBox(height: 32),
-
-                  // Dispensed Prescriptions Header
-                  const Text(
-                    'Dispensed Prescriptions',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 18),
+                  // Patient List
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: prescriptions.length,
+                      itemBuilder: (context, index) {
+                        var prescription = prescriptions[index];
+                        return _buildPrescriptionCard(
+                          prescription['id'],
+                          prescription['firstName'],
+                          prescription['lastName'],
+                          prescription['physicianName'],
+                          prescription['status'],
+                          context,
+                        );
+                      },
+                    ),
                   ),
-                  const SizedBox(height: 16),
-
-                  // Dispensed Prescriptions
-                  _buildDispensedItem('Acetaminophen', '100 mg. 1 tablet, oral, twice daily for 10 days'),
-                  _buildDispensedItem('Ibuprofen', '200 mg. 1 tablet, oral, twice daily for 10 days'),
-                  _buildDispensedItem('Clindamycin', '5 mL, 1 bottle, topical, twice daily for 7 days'),
                 ],
               ),
             ),
@@ -79,7 +102,7 @@ class PharmacistHome extends StatelessWidget {
     );
   }
 
-  // Sidebar item
+  // Sidebar Item
   Widget _buildSidebarItem(String title, {bool isActive = false}) {
     return Container(
       width: double.infinity,
@@ -96,8 +119,14 @@ class PharmacistHome extends StatelessWidget {
     );
   }
 
-  // Prescription card with Review button
-  Widget _buildPrescriptionCard(String name, String details, String actionText) {
+  // Prescription Card
+  Widget _buildPrescriptionCard(
+      int prescriptionId,
+      String firstName,
+      String lastName,
+      String physicianName,
+      String status,
+      BuildContext context) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -110,42 +139,34 @@ class PharmacistHome extends StatelessWidget {
           ),
           child: const Icon(Icons.medical_services, color: Colors.white),
         ),
-        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(details),
-        trailing: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[300],
-            foregroundColor: Colors.black,
-          ),
-          onPressed: () {},
-          child: Text(actionText),
-        ),
-      ),
-    );
-  }
-
-  // Dispensed prescriptions row
-  Widget _buildDispensedItem(String name, String details) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(details, style: const TextStyle(color: Colors.grey)),
-            ],
-          ),
-          const Text(
-            'Dispensed',
-            style: TextStyle(
-                color: Colors.grey, fontWeight: FontWeight.bold),
-          ),
-        ],
+        title: Text("$firstName $lastName",
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle:
+            Text(physicianName, style: const TextStyle(color: Colors.grey)),
+        trailing: status == 'pending'
+            ? ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[300],
+                  foregroundColor: Colors.black,
+                ),
+                onPressed: () {
+                  // Navigate to Review Prescription Screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReviewPrescriptionScreen(
+                          prescriptionId: prescriptionId),
+                    ),
+                  );
+                },
+                child: const Text('Review'),
+              )
+            : const Text(
+                'Dispensed',
+                style:
+                    TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+              ),
       ),
     );
   }
 }
-

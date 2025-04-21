@@ -175,7 +175,7 @@ class AppDatabase extends _$AppDatabase {
   // Create a private static instance
   static final AppDatabase _instance = AppDatabase._internal();
 
-  // Private named constructor
+
   AppDatabase._internal([QueryExecutor? e])
       : super(
     e ??
@@ -199,10 +199,9 @@ class AppDatabase extends _$AppDatabase {
         ),
   );
 
-  // Factory constructor that always returns the same instance.
+  // Factory constructor that returns the same instance each time.
   factory AppDatabase() => _instance;
 
-  // ... (rest of your methods remain unchanged)
 
   @override
   int get schemaVersion => 1;
@@ -290,6 +289,21 @@ class AppDatabase extends _$AppDatabase {
     return true;
   }
 
+  Future<Prescription> GetPrescription(int ID) async{
+    return await (select(prescriptions)..where((p) => p.prescriptionId.equals(ID))).getSingle();
+  }
+
+  Future<List<PrescriptionItem>> GetPrescriptionItems(int ID) async{
+    return await (select(prescriptionItems)..where((item) => item.prescriptionId.equals(ID))).get();
+  }
+
+  Future<Medication> GetMedicationInfo(int ID) async{
+    return await (select(medications)..where((med) => med.medicationId.equals(ID))).getSingle();
+  }
+
+
+
+  //    var Items = await select(prescriptionItems)..where((item) => item.prescriptionId.equals(ID));
   // ------------------- end of Prescriptions CRUD OPS -----------------------------
 
   // ------------------- Medicine CRUD OPS -----------------------------
