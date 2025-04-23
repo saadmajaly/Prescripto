@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../AuthLogic/AuthProvider.dart';
 import '../../data/database.dart';
 import 'PrescriptionsBackEnd.dart';
+import 'SinglePrescription.dart';
 
 class Prescriptions extends StatefulWidget {
   const Prescriptions({super.key});
@@ -25,7 +26,7 @@ class _PrescriptionsState extends State<Prescriptions> {
   Future<void> _fetchPrescriptions() async {
     final AppDatabase db = AppDatabase();
     var authProvider = new AuthProvider(db);
-    var nationalId = authProvider.getLoggedInNationalID() as String; // Replace with real user ID
+    var nationalId = await authProvider.getLoggedInNationalID() as String; // Replace with real user ID
     final prescriptions = await backend.getPrescriptions(nationalId);
     setState(() {
       activePrescriptions = prescriptions["active"]!;
@@ -87,6 +88,7 @@ class _PrescriptionsState extends State<Prescriptions> {
       itemBuilder: (context, index) {
         final prescription = prescriptions[index];
         return _buildPrescriptionTile(
+          id: prescription["id"]!,
           name: prescription["name"]!,
           instructions: prescription["instructions"]!,
           expiredDate: prescription["expiredDate"]!,
@@ -110,6 +112,7 @@ class _PrescriptionsState extends State<Prescriptions> {
     required String instructions,
     required DateTime expiredDate,
     required bool isExpired,
+    required int id,
   }) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -135,7 +138,11 @@ class _PrescriptionsState extends State<Prescriptions> {
           ],
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-      ),
-    );
+        onTap: () {Navigator.push(
+          context,MaterialPageRoute(
+            builder: (_) => SinglePrescription(prescriptionId: id,),
+        )
+      );},
+    ));
   }
 }

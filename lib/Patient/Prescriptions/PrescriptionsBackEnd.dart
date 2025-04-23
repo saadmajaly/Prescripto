@@ -30,6 +30,7 @@ class PrescriptionsBackEnd {
 
         if (medication != null) {
           final Map<String, dynamic> prescriptionData = {
+            "id":prescription.prescriptionId,
             "name": "${medication.name} ${item.dosage ?? ''}",
             "instructions": prescription.instructions ?? "No instructions",
             "expiredDate": prescription.createdAt.add(Duration(days: 30)), // Assuming a 30-day validity
