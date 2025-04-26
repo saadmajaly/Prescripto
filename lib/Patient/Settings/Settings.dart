@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prescripto/AuthLogic/AuthProvider.dart';
 import 'package:prescripto/Patient/Auth/Login.dart';
 import 'package:prescripto/data/database.dart';
-
+import 'package:prescripto/Patient/Prescriptions/SendToPharmacy.dart';
 import 'UpdateProfile.dart';
 
 class Settings extends StatefulWidget {
@@ -157,7 +157,11 @@ class _Settings extends State<Settings> {
               ),
             ),
             onTap: () {
-              // Handle delete account
+              AppDatabase db = new AppDatabase();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => SendToPharmacy(database: db,)),
+              );
             },
           )
 
