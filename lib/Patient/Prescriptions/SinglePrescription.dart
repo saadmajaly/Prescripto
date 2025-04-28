@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/Patient/Prescriptions/SendToPharmacy.dart';
 
 import '../../data/database.dart';
 
@@ -194,9 +195,10 @@ class _SinglePrescriptionState extends State<SinglePrescription> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
+
                         onPressed: () {
-                          // Handle sending to pharmacy here
-                        },
+                          final AppDatabase datab = new AppDatabase();
+                          Navigator.push(context,MaterialPageRoute(builder: (context) => SendToPharmacy(datab)));},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           padding: const EdgeInsets.symmetric(vertical: 16.0),

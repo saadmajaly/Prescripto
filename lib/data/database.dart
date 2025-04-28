@@ -115,6 +115,11 @@ class EmergencyAccessRequests extends Table {
   IntColumn get physicianId => integer()();
   TextColumn get reason => text()();
   TextColumn get status => text().withDefault(const Constant('pending'))();
+  // four status
+  // pending => sent from the physician and pending with the patient or rejected from the pharmacy
+  // waiting => Sent to the pharmacy and waiting for approval or decline
+  // accepted => Accepted by a phramacist and waiting for dispense
+  // dispensed => the patient picked up the prescription
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   @override
   List<String> get customConstraints => [

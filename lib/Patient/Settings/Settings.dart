@@ -158,10 +158,7 @@ class _Settings extends State<Settings> {
             ),
             onTap: () {
               AppDatabase db = new AppDatabase();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => SendToPharmacy(database: db,)),
-              );
+
             },
           )
 

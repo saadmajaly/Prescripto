@@ -1,5 +1,5 @@
 // lib/pages/select_pharmacy_page.dart
-
+import 'SentSuccessfully.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -10,7 +10,7 @@ import 'package:prescripto/data/database.dart';
 
 class SendToPharmacy extends StatefulWidget {
   final AppDatabase database;
-  const SendToPharmacy({Key? key, required this.database}) : super(key: key);
+  const SendToPharmacy(this.database, { Key? key }) : super(key: key);
 
   @override
   _SendToPharmacyState createState() => _SendToPharmacyState();
@@ -236,7 +236,7 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'List View',
+                      'Pharmacies',
                       style: Theme.of(ctx).textTheme.titleMedium,
                     ),
                   ),
@@ -258,11 +258,15 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
                         trailing: ElevatedButton(
                           onPressed: () =>
                               setState(() => _selectedId = p.pharmacyId),
-                          child: Text(sel ? 'Selected' : 'Select'),
+
+                          child: Text(sel ? 'Selected' : 'Select',
+                          style: TextStyle(color: sel
+                          ? Colors.white60
+                          : Colors.white),),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: sel
                                 ? Colors.grey.shade400
-                                : Theme.of(ctx).primaryColor,
+                                : Colors.blue,
                           ),
                         ),
                       );
@@ -285,7 +289,9 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
                       : () {
                     final chosen = _all.firstWhere(
                             (p) => p.pharmacyId == _selectedId);
-                    Navigator.pop(context, chosen);
+                    Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PrescriptionSentSuccessfully())
+                    );
                   },
                   child: Text('Send to selected Pharmacy'),
                 ),
