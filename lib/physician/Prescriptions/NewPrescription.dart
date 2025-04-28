@@ -4,7 +4,7 @@ import 'package:prescripto/physician/Feedback/Feedback.dart';
 import 'package:prescripto/physician/Patients/Patients.dart';
 import 'package:prescripto/physician/Home/Home.dart';
 import 'package:prescripto/physician/Prescriptions/NewPrescriptionBackEnd.dart';
-import 'package:prescripto/data/database.dart'; // Import the database
+import 'package:prescripto/data/database.dart';
 
 class NewPrescription extends StatefulWidget {
   const NewPrescription({super.key});
@@ -16,15 +16,20 @@ class NewPrescription extends StatefulWidget {
 class _NewPrescriptionState extends State<NewPrescription> {
   List<Map<String, dynamic>> patients = [];
   String? selectedPatient;
-  final TextEditingController drugNameController = TextEditingController();
-  final TextEditingController instructionsController = TextEditingController();
-  final TextEditingController pharmacyNameController = TextEditingController();
-  final TextEditingController pharmacyAddressController = TextEditingController();
-  String? selectedRefills;
-  String? selectedDAW;
 
   final List<String> refills = ['0', '1', '2', '3', '4+'];
   final List<String> dawOptions = ['Yes', 'No'];
+
+  List<Map<String, dynamic>> prescriptions = [
+    {
+      'drugName': TextEditingController(),
+      'instructions': TextEditingController(),
+      'refills': null,
+      'daw': null,
+      'pharmacyName': TextEditingController(),
+      'pharmacyAddress': TextEditingController(),
+    }
+  ];
 
   @override
   void initState() {
@@ -32,7 +37,6 @@ class _NewPrescriptionState extends State<NewPrescription> {
     fetchPatients();
   }
 
-  /// Fetch patients from the backend
   Future<void> fetchPatients() async {
     final db = AppDatabase();
     List<Map<String, dynamic>> patientList = await PrescriptionService.fetchPatients(db);
@@ -41,46 +45,56 @@ class _NewPrescriptionState extends State<NewPrescription> {
     });
   }
 
-  /// Submit the prescription to the backend
   Future<void> submitPrescription() async {
-    if (selectedPatient == null || drugNameController.text.isEmpty || instructionsController.text.isEmpty) {
+    if (selectedPatient == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all required fields')),
+        const SnackBar(content: Text('Please select a patient')),
       );
       return;
     }
 
     final db = AppDatabase();
-    bool success = await PrescriptionService.submitPrescription(
-      db,
-      patientId: int.parse(selectedPatient!), // Convert from String to int
-      physicianId: 1, // Replace with actual logged-in physician ID
-      instructions: instructionsController.text,
-      medications: [
-        {
-          'medicationId': 1, // Replace with actual medication ID
-          'dosage': '500mg',
-          'frequency': 'Twice a day',
-          'quantity': 10,
-        }
-      ],
-    );
 
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Prescription submitted successfully!')),
+    for (var prescription in prescriptions) {
+      if (prescription['drugName'].text.isEmpty || prescription['instructions'].text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please fill in all required fields in each prescription')),
+        );
+        return;
+      }
+
+      bool success = await PrescriptionService.submitPrescription(
+        db,
+        patientId: int.parse(selectedPatient!),
+        physicianId: 1, // Replace with actual logged-in physician ID
+        instructions: prescription['instructions'].text,
+        medications: [
+          {
+            'medicationId': 1, // Replace with actual medication ID
+            'dosage': prescription['drugName'].text,
+            'frequency': prescription['instructions'].text,
+            'quantity': 10,
+          }
+        ],
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to submit prescription')),
-      );
+
+      if (!success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to submit one of the prescriptions')),
+        );
+        return;
+      }
     }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('All prescriptions submitted successfully!')),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF5F5F5),
       body: Row(
         children: [
           _buildSidebar(context),
@@ -98,23 +112,25 @@ class _NewPrescriptionState extends State<NewPrescription> {
                     const SizedBox(height: 20),
                     _buildPatientDropdown(),
                     const SizedBox(height: 20),
-                    _buildSectionTitle('Prescription information'),
-                    _buildTextField('Drug name', drugNameController),
-                    _buildTextField('Instructions', instructionsController, maxLines: 4),
-                    _buildDropdownField('Refills', refills, selectedRefills, (val) {
-                      setState(() {
-                        selectedRefills = val;
-                      });
-                    }),
-                    _buildDropdownField('Dispense as written (DAW)', dawOptions, selectedDAW, (val) {
-                      setState(() {
-                        selectedDAW = val;
-                      });
-                    }),
-                    const SizedBox(height: 20),
-                    _buildSectionTitle('Pharmacy preference'),
-                    _buildTextField('Pharmacy name', pharmacyNameController),
-                    _buildTextField('Pharmacy address', pharmacyAddressController),
+                    _buildPrescriptions(),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: const Icon(Icons.add_circle, size: 36, color: Colors.blue),
+                        onPressed: () {
+                          setState(() {
+                            prescriptions.add({
+                              'drugName': TextEditingController(),
+                              'instructions': TextEditingController(),
+                              'refills': null,
+                              'daw': null,
+                              'pharmacyName': TextEditingController(),
+                              'pharmacyAddress': TextEditingController(),
+                            });
+                          });
+                        },
+                      ),
+                    ),
                     const SizedBox(height: 30),
                     Align(
                       alignment: Alignment.centerRight,
@@ -146,7 +162,7 @@ class _NewPrescriptionState extends State<NewPrescription> {
   Widget _buildSidebar(BuildContext context) {
     return Container(
       width: 250,
-   color: const Color.fromARGB(255, 0, 150, 136),  // #009688
+      color: const Color.fromARGB(255, 0, 150, 136),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -176,7 +192,7 @@ class _NewPrescriptionState extends State<NewPrescription> {
             leading: const Icon(Icons.feedback),
             title: const Text('Feedback'),
             onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => FeedbackScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => FeedbackScreen()));
             },
           ),
           ListTile(
@@ -185,18 +201,16 @@ class _NewPrescriptionState extends State<NewPrescription> {
             onTap: () {},
           ),
           ListTile(
-                  leading: Icon(Icons.logout_outlined),
-                  title: Text('Log out'),
-                  onTap: () {
-                    // Clear user data if needed
-                    // Then navigate to login screen
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => WebLoginPage ()),
-                      (route) => false,
-                    );
-                  },
-                ),
+            leading: const Icon(Icons.logout_outlined),
+            title: const Text('Log out'),
+            onTap: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => WebLoginPage()),
+                (route) => false,
+              );
+            },
+          ),
         ],
       ),
     );
@@ -215,12 +229,45 @@ class _NewPrescriptionState extends State<NewPrescription> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, {int maxLines = 1}) {
+  Widget _buildPrescriptions() {
+    return Column(
+      children: prescriptions.asMap().entries.map((entry) {
+        int index = entry.key;
+        var prescription = entry.value;
+
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 12),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Prescription ${index + 1}'),
+                _buildTextField('Drug name', prescription['drugName']),
+                _buildTextField('Instructions', prescription['instructions'], maxLines: 3),
+                _buildDropdownField('Refills', refills, prescription['refills'], (val) {
+                  setState(() => prescription['refills'] = val);
+                }),
+                _buildDropdownField('Dispense as written (DAW)', dawOptions, prescription['daw'], (val) {
+                  setState(() => prescription['daw'] = val);
+                }),
+                _buildTextField('Pharmacy name', prescription['pharmacyName']),
+                _buildTextField('Pharmacy address', prescription['pharmacyAddress']),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller, {int maxLines = 1, Function(String)? onChanged}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         controller: controller,
         maxLines: maxLines,
+        onChanged: onChanged,
         decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(),
