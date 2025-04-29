@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-
+import 'package:prescripto/CommonWeb/login_screen.dart';
+import 'package:prescripto/physician/Feedback/Feedback.dart';
+import 'package:prescripto/physician/Patients/Patients.dart';
+import 'package:prescripto/physician/Prescriptions/NewPrescription.dart';
+import 'package:prescripto/physician/Home/HomeBackEnd.dart';
+import 'package:prescripto/data/database.dart';
 class FeedbackScreen extends StatefulWidget {
   @override
   _FeedbackScreenState createState() => _FeedbackScreenState();

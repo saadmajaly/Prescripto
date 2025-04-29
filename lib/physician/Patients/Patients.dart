@@ -92,28 +92,37 @@ class _PatientsPageState extends State<Patients> {
 @override
   Widget build(BuildContext context) {
     return Scaffold(
- backgroundColor: const Color(0xFFF5F5F5),
-
+      backgroundColor: const Color(0xFFF5F5F5),
       body: Row(
         children: [
-          // Sidebar Menu
+          // Sidebar
           Container(
             width: 200,
-        color: const Color.fromARGB(255, 0, 150, 136),  // #009688
-
+            color: Colors.indigo[200],
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(
+                  height: 160,
+                  width: double.infinity,
+                  child: Image.asset(
+                    'assets/PrescriptoLogo.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 ListTile(
-                  leading: Icon(Icons.home),
-                  title: Text('Home'),
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => physicianHome()));
-                  },
+                  leading: const Icon(Icons.home),
+                  title: const Text('Home'),
+                  onTap: () {       
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => physicianHome()),
+                    );},
                 ),
                 ListTile(
-                  leading: Icon(Icons.edit),
-                  title: Text('New Prescriptions'),
+                  leading: const Icon(Icons.edit),
+                  title: const Text('New Prescriptions'),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -121,18 +130,16 @@ class _PatientsPageState extends State<Patients> {
                     );
                   },
                 ),
-              ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text('Patients'),
-            onTap: () {
-             
-            },
-          ),
-                  
-                
                 ListTile(
-                  leading: Icon(Icons.feedback),
-                  title: Text('Feedback'),
+                  leading: const Icon(Icons.person),
+                  title: const Text('Patients'),
+                  onTap: () {
+                   
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.feedback),
+                  title: const Text('Feedback'),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -141,19 +148,17 @@ class _PatientsPageState extends State<Patients> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.help),
-                  title: Text('Help'),
+                  leading: const Icon(Icons.help),
+                  title: const Text('Help'),
                   onTap: () {},
                 ),
                 ListTile(
-                  leading: Icon(Icons.logout_outlined),
-                  title: Text('Log out'),
+                  leading: const Icon(Icons.logout_outlined),
+                  title: const Text('Log out'),
                   onTap: () {
-                    // Clear user data if needed
-                    // Then navigate to login screen
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => WebLoginPage ()),
+                      MaterialPageRoute(builder: (context) => WebLoginPage()),
                       (route) => false,
                     );
                   },
@@ -161,6 +166,7 @@ class _PatientsPageState extends State<Patients> {
               ],
             ),
           ),
+
           // Main Content Area
           Expanded(
             child: Padding(

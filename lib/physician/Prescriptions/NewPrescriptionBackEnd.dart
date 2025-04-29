@@ -32,7 +32,7 @@ class PrescriptionService {
     required int patientId,
     required int physicianId,
     required String instructions,
-    required List<Map<String, dynamic>> medications,
+    required List<Map<String, dynamic>> medications, required String pharmacyAddress, required String pharmacyName,
   }) async {
     try {
       // أولاً: نضيف سجّل الوصفة الرئيسي في جدول Prescriptions
