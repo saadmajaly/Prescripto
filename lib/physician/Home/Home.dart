@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:prescripto/CommonWeb/login_screen.dart';
 import 'package:prescripto/physician/Feedback/Feedback.dart';
+import 'package:prescripto/physician/Help/Help.dart';
 import 'package:prescripto/physician/Patients/Patients.dart';
 import 'package:prescripto/physician/Prescriptions/NewPrescription.dart';
 import 'package:prescripto/physician/Home/HomeBackEnd.dart';
@@ -15,13 +16,22 @@ class physicianHome extends StatelessWidget {
       backgroundColor: const Color(0xFFF5F5F5),
       body: Row(
         children: [
-          // Sidebar Menu
+          // Sidebar
           Container(
             width: 200,
-            color: const Color.fromARGB(255, 0, 150, 136), // #009688
+            color: Colors.indigo[200],
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(
+                  height: 160,
+                  width: double.infinity,
+                  child: Image.asset(
+                    'assets/PrescriptoLogo.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 ListTile(
                   leading: const Icon(Icons.home),
                   title: const Text('Home'),
@@ -60,7 +70,12 @@ class physicianHome extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.help),
                   title: const Text('Help'),
-                  onTap: () {},
+                  onTap: () {     
+                       Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HelpPage()),
+                    );
+                    },
                 ),
                 ListTile(
                   leading: const Icon(Icons.logout_outlined),
@@ -97,10 +112,9 @@ class physicianHome extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
 
-                  // ==== STATISTIC CARD ROW ====
+                  // Stat Cards
                   const Row(
                     children: [
                       StatCard(
@@ -109,12 +123,19 @@ class physicianHome extends StatelessWidget {
                         footnote: 'as of today',
                         topRightIcon: Icons.people,
                       ),
+                      SizedBox(width: 20),
+                      StatCard(
+                        title: 'Prescriptions ',
+                        value: '45',
+                        footnote: 'updated hourly',
+                        topRightIcon: Icons.medical_services,
+                      ),
                     ],
                   ),
 
                   const SizedBox(height: 20),
 
-                  // Charts or other content
+                  // Graph and Prescription List
                   Expanded(
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,6 +158,14 @@ class physicianHome extends StatelessWidget {
                       ],
                     ),
                   ),
+
+                  const SizedBox(height: 20),
+
+                  // Prescription List
+                  const Expanded(
+                    flex: 2,
+                    child: RecentPrescriptions(),
+                  ),
                 ],
               ),
             ),
@@ -147,7 +176,7 @@ class physicianHome extends StatelessWidget {
   }
 }
 
-/// Placeholder for charts
+// Placeholder widget
 Widget _buildPlaceholder({
   required double height,
   required String label,
@@ -167,7 +196,7 @@ Widget _buildPlaceholder({
   );
 }
 
-/// Simplified StatCard (only title, value, footnote)
+// StatCard widget
 class StatCard extends StatelessWidget {
   final String title;
   final String value;
@@ -201,7 +230,6 @@ class StatCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title + icon
           Row(
             children: [
               Expanded(
@@ -216,10 +244,7 @@ class StatCard extends StatelessWidget {
               Icon(topRightIcon, size: 20, color: Colors.grey[400]),
             ],
           ),
-
           const SizedBox(height: 12),
-
-          // Big value
           Text(
             value,
             style: const TextStyle(
@@ -227,15 +252,71 @@ class StatCard extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-
           const SizedBox(height: 12),
-
-          // Footnote
           Text(
             footnote,
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Prescription list widget
+class RecentPrescriptions extends StatelessWidget {
+  const RecentPrescriptions({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final prescriptions = [
+      {'id': '#220365', 'date': '2 days ago'},
+      {'id': '#193625', 'date': '4 days ago'},
+      {'id': '#186325', 'date': '1 week ago'},
+      {'id': '#175635', 'date': '3 weeks ago'},
+      {'id': '#171963', 'date': '1 month ago'},
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Search Bar
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Search prescriptions',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              filled: true,
+              fillColor: Colors.grey[100],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // List
+          Expanded(
+            child: ListView.builder(
+              itemCount: prescriptions.length,
+              itemBuilder: (context, index) {
+                final item = prescriptions[index];
+                return ListTile(
+                  leading: const Icon(Icons.description, color: Colors.indigo),
+                  title: Text(item['id']!),
+                  subtitle: Text('Created ${item['date']}'),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                );
+              },
             ),
           ),
         ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:prescripto/AuthLogic/AuthProvider.dart';
-import 'package:prescripto/data/database.dart';
+import '../../AuthLogic/AuthProvider.dart';
+import '../../data/database.dart';
 import 'TrackerBackEnd.dart';
 
 class Tracker extends StatefulWidget {
@@ -23,11 +23,12 @@ class _TrackerState extends State<Tracker> {
   }
 
   Future<void> _fetchTrackerData() async {
-    AppDatabase db = new AppDatabase();
-    AuthProvider auth = new AuthProvider(db);
-    String nationalId = auth.getLoggedInNationalID() as String;
-    var schedule = await backend.getTodaysSchedule(nationalId);
-    var log = await backend.getMedicationLog(nationalId);
+    final AppDatabase db = AppDatabase();
+    final authProvider = AuthProvider(db);
+    final nationalId = await authProvider.getLoggedInNationalID() as String;
+
+    final schedule = await backend.getTodaysSchedule(nationalId);
+    final log = await backend.getMedicationLog(nationalId);
 
     setState(() {
       todaySchedule = schedule;
@@ -45,7 +46,7 @@ class _TrackerState extends State<Tracker> {
           'Medication Tracker',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.black,
         elevation: 0,
       ),
@@ -112,7 +113,9 @@ class _TrackerState extends State<Tracker> {
   Widget _buildAddMedicationButton() {
     return Center(
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          // Add medication action
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blueAccent,
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
