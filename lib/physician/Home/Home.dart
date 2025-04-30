@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:prescripto/CommonWeb/login_screen.dart';
 import 'package:prescripto/physician/Feedback/Feedback.dart';
+import 'package:prescripto/physician/Help/Help.dart';
 import 'package:prescripto/physician/Patients/Patients.dart';
 import 'package:prescripto/physician/Prescriptions/NewPrescription.dart';
 import 'package:prescripto/physician/Home/HomeBackEnd.dart';
@@ -69,7 +70,12 @@ class physicianHome extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.help),
                   title: const Text('Help'),
-                  onTap: () {},
+                  onTap: () {     
+                       Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HelpPage()),
+                    );
+                    },
                 ),
                 ListTile(
                   leading: const Icon(Icons.logout_outlined),

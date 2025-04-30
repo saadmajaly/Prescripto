@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prescripto/CommonWeb/login_screen.dart';
 import 'package:prescripto/data/database.dart'; // <-- Adjust to your actual path
 import 'package:prescripto/physician/Feedback/Feedback.dart';
+import 'package:prescripto/physician/Help/Help.dart';
 import 'package:prescripto/physician/Home/Home.dart';
 import 'package:prescripto/physician/Prescriptions/NewPrescription.dart';
 import 'package:prescripto/physician/Patients/PatientsBackEnd.dart';
@@ -150,7 +151,10 @@ class _PatientsPageState extends State<Patients> {
                 ListTile(
                   leading: const Icon(Icons.help),
                   title: const Text('Help'),
-                  onTap: () {},
+                  onTap: () { Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HelpPage()),
+                    );},
                 ),
                 ListTile(
                   leading: const Icon(Icons.logout_outlined),

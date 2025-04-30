@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:prescripto/CommonWeb/login_screen.dart';
 import 'package:prescripto/physician/Feedback/Feedback.dart';
+import 'package:prescripto/physician/Help/Help.dart';
 import 'package:prescripto/physician/Patients/Patients.dart';
 import 'package:prescripto/physician/Home/Home.dart';
 import 'package:prescripto/physician/Prescriptions/NewPrescriptionBackEnd.dart';
@@ -225,7 +226,10 @@ class _NewPrescriptionState extends State<NewPrescription> {
           ListTile(
             leading: const Icon(Icons.help),
             title: const Text('Help'),
-            onTap: () {},
+            onTap: ()=> Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HelpPage()),
+            ), 
           ),
           ListTile(
             leading: const Icon(Icons.logout_outlined),
