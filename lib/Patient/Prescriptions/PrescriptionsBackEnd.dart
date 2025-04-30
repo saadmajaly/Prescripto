@@ -3,12 +3,12 @@ import '../../data/database.dart';
 class PrescriptionsBackEnd {
   final AppDatabase db = AppDatabase();
 
-  // Fetch prescriptions from database
+  // get the prescriptions from database
   Future<Map<String, List<Map<String, dynamic>>>> getPrescriptions(String nationalId) async {
     final user = await db.getUserByNatID(nationalId);
     if (user == null) return {"active": [], "past": []}; // Return empty if user not found
 
-    // Get user's prescriptions
+    // Get the user prescriptions
     final prescriptions = await (db.select(db.prescriptions)
       ..where((p) => p.patientId.equals(user.id)))
         .get();
@@ -16,14 +16,14 @@ class PrescriptionsBackEnd {
     List<Map<String, dynamic>> activePrescriptions = [];
     List<Map<String, dynamic>> pastPrescriptions = [];
 
+    //get prescription items
     for (var prescription in prescriptions) {
-      // Get prescription items
       final items = await (db.select(db.prescriptionItems)
         ..where((p) => p.prescriptionId.equals(prescription.prescriptionId)))
           .get();
 
+      // get meds details
       for (var item in items) {
-        // Get medication details
         final medication = await (db.select(db.medications)
           ..where((m) => m.medicationId.equals(item.medicationId)))
             .getSingleOrNull();

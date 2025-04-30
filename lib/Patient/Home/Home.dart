@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'HomeBackEnd.dart'; // Import your backend file
+import 'package:prescripto/data/database.dart';
+import 'HomeBackEnd.dart';
+import 'package:prescripto/AuthLogic/AuthProvider.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -20,12 +22,13 @@ class _HomeState extends State<Home> {
     _fetchData();
   }
 
-  // Fetch data from the backend and update state
   Future<void> _fetchData() async {
-    const String nationalId = "9999999999"; // Replace with actual user ID
-    final name = await backend.getUserName(nationalId);
-    final nextMed = await backend.getNextMedicationReminder(nationalId);
-    final activeMeds = await backend.getActiveMedications(nationalId);
+    var db = new AppDatabase();
+    var auth = new AuthProvider(db);
+    String nationalId = auth.getLoggedInNationalID() as String;
+    var name = await backend.getUserName(nationalId);
+    var nextMed = await backend.getNextMedicationReminder(nationalId);
+    var activeMeds = await backend.getActiveMedications(nationalId);
 
     setState(() {
       userName = name ?? "User";
@@ -52,7 +55,6 @@ class _HomeState extends State<Home> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // User Profile Header
             Row(
               children: [
                 const CircleAvatar(
@@ -67,8 +69,6 @@ class _HomeState extends State<Home> {
               ],
             ),
             const SizedBox(height: 32),
-
-            // Next Medication Reminder
             const Text(
               'Next Medication Reminder',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -116,7 +116,7 @@ class _HomeState extends State<Home> {
             ),
             const SizedBox(height: 32),
 
-            // Active Prescriptions
+            // Active Presc section
             const Text(
               'Active Prescriptions',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -126,8 +126,8 @@ class _HomeState extends State<Home> {
             activeMedications.isEmpty
                 ? const Center(child: Text("No active prescriptions"))
                 : Wrap(
-              spacing: 20, // Space between items horizontally
-              runSpacing: 20, // Space between rows
+              spacing: 20,
+              runSpacing: 20,
               alignment: WrapAlignment.center,
               children: activeMedications.map((med) {
                 return Column(

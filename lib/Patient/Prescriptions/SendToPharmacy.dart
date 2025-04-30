@@ -17,12 +17,12 @@ class SendToPharmacy extends StatefulWidget {
 }
 
 class _SendToPharmacyState extends State<SendToPharmacy> {
-  // ─── Map state ─────────────────────────────────────
+
   late final MapController _mapController;
-  LatLng _mapCenter = LatLng(31.95, 35.90); // default from your seed data
+  LatLng _mapCenter = LatLng(31.95, 35.90);
   double _mapZoom = 13.0;
 
-  // ─── Data + filters ───────────────────────────────
+
   List<Pharmacy> _all = [];
   List<Pharmacy> _filtered = [];
   int? _selectedId;
@@ -37,7 +37,7 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
     _mapController = MapController();
     _searchCtl.addListener(_applyFilters);
 
-    // stream all pharmacies from Drift
+    // get all pharmacies
     widget.database
         .select(widget.database.pharmacies)
         .watch()
@@ -54,7 +54,6 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
       final addrMatch = (p.address ?? '').toLowerCase().contains(q);
       final insMatch = _insuranceFilter == 'All' ||
           (p.acceptsInsurance && _insuranceFilter == 'Accepts Insurance');
-      // stubbed: wire up real open-hours / pickup flags if you add those fields
       return (nameMatch || addrMatch) && insMatch;
     }).toList();
 
@@ -84,7 +83,6 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
       ),
       body: Column(
         children: [
-          // ─── Search bar ─────────────────────
           Padding(
             padding: const EdgeInsets.all(8),
             child: TextField(
@@ -99,7 +97,6 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
             ),
           ),
 
-          // ─── Filters ────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Row(
@@ -133,11 +130,9 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
             ),
           ),
 
-          // ─── Map + List ─────────────────────
           Expanded(
             child: Column(
               children: [
-                // —— Map ——
                 Expanded(
                   flex: 1,
                   child: Stack(
@@ -145,7 +140,7 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
                       FlutterMap(
                         mapController: _mapController,
                         options: MapOptions(
-                          initialCenter: _mapCenter,  // v8 uses initialCenter/initialZoom :contentReference[oaicite:0]{index=0}
+                          initialCenter: _mapCenter,
                           initialZoom: _mapZoom,
                           onPositionChanged: (pos, _) {
                             if (pos.center != null && pos.zoom != null) {
@@ -156,7 +151,7 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
                             }
                           },
                         ),
-                        children: [                  // v8 layers go into children :contentReference[oaicite:1]{index=1}
+                        children: [
                           TileLayer(
                             urlTemplate:
                             'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -189,7 +184,6 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
                         ],
                       ),
 
-                      // —— Zoom & locate buttons ——
                       Positioned(
                         bottom: 12,
                         right: 12,
@@ -219,8 +213,8 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
                             SizedBox(height: 8),
                             FloatingActionButton(
                               mini: true,
-                              child: Icon(Icons.my_location),
                               onPressed: _locateMe,
+                              child: Icon(Icons.my_location),
                             ),
                           ],
                         ),
@@ -229,7 +223,6 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
                   ),
                 ),
 
-                // —— List header ——
                 Padding(
                   padding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -242,7 +235,6 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
                   ),
                 ),
 
-                // —— Pharmacy list ——
                 Expanded(
                   flex: 1,
                   child: ListView.builder(
@@ -258,16 +250,13 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
                         trailing: ElevatedButton(
                           onPressed: () =>
                               setState(() => _selectedId = p.pharmacyId),
-
-                          child: Text(sel ? 'Selected' : 'Select',
-                          style: TextStyle(color: sel
-                          ? Colors.white60
-                          : Colors.white),),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: sel
                                 ? Colors.grey.shade400
                                 : Colors.blue,
                           ),
+
+                          child: Text(sel ? 'Selected' : 'Select', style: TextStyle(color: sel ? Colors.white60 : Colors.white),),
                         ),
                       );
                     },
@@ -277,7 +266,6 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
             ),
           ),
 
-          // ─── Bottom CTA ─────────────────────
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(12),

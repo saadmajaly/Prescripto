@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import '../../../AuthLogic/AuthProvider.dart';
 import 'package:prescripto/Patient/Auth/Signup.dart';
-import '../Home/Home.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -43,7 +42,6 @@ class _WebLoginPageState extends State<Login> {
             const SnackBar(content: Text('Invalid National ID or password')),
           );
         }
-        // Navigation to the HomePage will be handled by the Consumer in MyApp.
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(error.toString())),
@@ -55,7 +53,6 @@ class _WebLoginPageState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // AppBar with a back button (optional)
       appBar: AppBar(
         title: const Text(
           'Login',
@@ -64,7 +61,6 @@ class _WebLoginPageState extends State<Login> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      // Main content
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Form(
@@ -72,9 +68,7 @@ class _WebLoginPageState extends State<Login> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Spacing at the top
               const SizedBox(height: 40),
-              // Page Title
               const Text(
                 'Log in to your account',
                 style: TextStyle(
@@ -83,7 +77,6 @@ class _WebLoginPageState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 40),
-              // National ID Field
               TextFormField(
                 controller: _nationalIdController,
                 decoration: InputDecoration(
@@ -92,7 +85,6 @@ class _WebLoginPageState extends State<Login> {
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.image),
                     onPressed: () {
-                      // Handle National ID image icon action if needed
                     },
                   ),
                   border: const OutlineInputBorder(),
@@ -105,7 +97,6 @@ class _WebLoginPageState extends State<Login> {
                 },
               ),
               const SizedBox(height: 20),
-              // Password Field
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -114,7 +105,6 @@ class _WebLoginPageState extends State<Login> {
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.search),
                     onPressed: () {
-                      // You can implement password visibility toggle here
                     },
                   ),
                   border: const OutlineInputBorder(),
@@ -128,7 +118,6 @@ class _WebLoginPageState extends State<Login> {
                 },
               ),
               const SizedBox(height: 20),
-              // Login Button with a blue background
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -146,12 +135,9 @@ class _WebLoginPageState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 10),
-         // Forgot Password
 Center(
   child: TextButton(
-    onPressed: () {
-      // Handle "Forgot password?" action
-    },
+    onPressed: () {},
     child: const Text(
       'Forgot password?',
       style: TextStyle(
@@ -161,7 +147,6 @@ Center(
     ),
   ),
 ),
-// Sign Up
 const SizedBox(height: 10),
 Row(
   mainAxisAlignment: MainAxisAlignment.center,

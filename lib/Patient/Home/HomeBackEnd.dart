@@ -3,32 +3,32 @@ import '../../data/database.dart';
 class HomeBackEnd {
   final AppDatabase db = AppDatabase();
 
-  // Get user name by national ID
+  // this function gets the first name of the user
   Future<String?> getUserName(String nationalId) async {
     final user = await db.getUserByNatID(nationalId);
-    return user?.firstName; // Return the user's first name
+    return user?.firstName;
   } 
 
-  // Get all prescriptions for a user
+  // get user prescriptions
   Future<List<Prescription>> getUserPrescriptions(String nationalId) async {
     final query = await db.GetUserPrescriptions(nationalId);
-    return query.get(); // Fetch prescriptions for the user
+    return query.get();
   }
 
-  // Get the next medication reminder (first upcoming prescription)
+  // Get the next med assigned to the user
   Future<Map<String, dynamic>?> getNextMedicationReminder(String nationalId) async {
     final prescriptions = await getUserPrescriptions(nationalId);
     if (prescriptions.isNotEmpty) {
       final prescription = prescriptions.first; // Get the first prescription
 
-      // Retrieve prescription items for this prescription
+      // get prescription items for any prescription
       final items = await (db.select(db.prescriptionItems)
         ..where((p) => p.prescriptionId.equals(prescription.prescriptionId)))
           .get();
 
       if (items.isNotEmpty) {
         final firstItem = items.first;
-        // Retrieve medication details
+        // get med details
         final medication = await (db.select(db.medications)
           ..where((m) => m.medicationId.equals(firstItem.medicationId)))
             .getSingleOrNull();
@@ -46,7 +46,7 @@ class HomeBackEnd {
     return null;
   }
 
-  // Get active medications from the user's prescriptions
+  // Get active meds from the user's prescriptions
   Future<List<Map<String, String>>> getActiveMedications(String nationalId) async {
     final prescriptions = await getUserPrescriptions(nationalId);
     final List<Map<String, String>> activeMeds = [];

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:prescripto/AuthLogic/AuthProvider.dart';
 import 'package:prescripto/Patient/Auth/Login.dart';
 import 'package:prescripto/data/database.dart';
-import 'package:prescripto/Patient/Prescriptions/SendToPharmacy.dart';
 import 'UpdateProfile.dart';
 
 class Settings extends StatefulWidget {
@@ -13,7 +12,6 @@ class Settings extends StatefulWidget {
 }
 
 class _Settings extends State<Settings> {
-  // Example of a variable to display chosen language
   String _language = 'English';
 
   @override
@@ -27,7 +25,6 @@ class _Settings extends State<Settings> {
       ),
       body: ListView(
         children: [
-          // --- ACCOUNT SECTION ---
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
@@ -49,7 +46,6 @@ class _Settings extends State<Settings> {
           ),
           const Divider(),
 
-          // --- CONTENT SECTION ---
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
@@ -63,14 +59,10 @@ class _Settings extends State<Settings> {
           ListTile(
             title: const Text('Language'),
             trailing: Text(_language),
-            onTap: () {
-              // Handle language change
-              // e.g. show a dialog or navigate to another screen
-            },
+            onTap: () {},
           ),
           const Divider(),
 
-          // --- NOTIFICATIONS SECTION ---
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
@@ -84,13 +76,10 @@ class _Settings extends State<Settings> {
           ListTile(
             title: const Text('Push Notifications'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              // Handle push notification settings
-            },
+            onTap: () {},
           ),
           const Divider(),
 
-          // --- ABOUT SECTION ---
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
@@ -121,14 +110,13 @@ class _Settings extends State<Settings> {
           ),
           const Divider(),
 
-          // --- LOG OUT & DELETE ACCOUNT ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, // Red background
+                backgroundColor: Colors.red,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0), // Removes default corner radius
+                  borderRadius: BorderRadius.circular(12.0),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
               ),

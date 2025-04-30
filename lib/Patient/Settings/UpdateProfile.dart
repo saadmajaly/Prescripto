@@ -49,7 +49,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
           child: Column(
             children: [
-              // First Name
               TextField(
                 controller: _firstNameController,
                 decoration: const InputDecoration(
@@ -59,7 +58,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
               ),
               const SizedBox(height: 16),
 
-              // Last Name
               TextField(
                 controller: _lastNameController,
                 decoration: const InputDecoration(
@@ -69,7 +67,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
               ),
               const SizedBox(height: 16),
 
-              // Email
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
@@ -80,7 +77,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
               ),
               const SizedBox(height: 16),
 
-              // Phone Number
               TextField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
@@ -91,7 +87,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
               ),
               const SizedBox(height: 16),
 
-              // Password Field
               TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -103,24 +98,16 @@ class _UpdateProfileState extends State<UpdateProfile> {
               ),
 
               SizedBox(height: 20,),
-              // Buttons Row
+
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        // Handle cancel logic
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SinglePrescription(
-                              prescriptionId: 4699, // Replace 123 with the actual ID you want to pass
-                            ),
-                          ),
-                        );
+                        Navigator.pop(context);
                       },
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black54, // Text color
+                        foregroundColor: Colors.black54,
                         side: const BorderSide(color: Colors.grey),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6.0),

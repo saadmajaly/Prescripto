@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/AuthLogic/AuthProvider.dart';
+import 'package:prescripto/data/database.dart';
 import 'TrackerBackEnd.dart';
 
 class Tracker extends StatefulWidget {
@@ -21,9 +23,11 @@ class _TrackerState extends State<Tracker> {
   }
 
   Future<void> _fetchTrackerData() async {
-    const String nationalId = "9999999999"; // Replace with actual user ID
-    final schedule = await backend.getTodaysSchedule(nationalId);
-    final log = await backend.getMedicationLog(nationalId);
+    AppDatabase db = new AppDatabase();
+    AuthProvider auth = new AuthProvider(db);
+    String nationalId = auth.getLoggedInNationalID() as String;
+    var schedule = await backend.getTodaysSchedule(nationalId);
+    var log = await backend.getMedicationLog(nationalId);
 
     setState(() {
       todaySchedule = schedule;
@@ -108,9 +112,7 @@ class _TrackerState extends State<Tracker> {
   Widget _buildAddMedicationButton() {
     return Center(
       child: ElevatedButton(
-        onPressed: () {
-          // Add medication action
-        },
+        onPressed: () {},
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blueAccent,
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),

@@ -82,8 +82,8 @@ class _PrescriptionsState extends State<Prescriptions> {
     return prescriptions.isEmpty
         ? _buildEmptyMessage(isExpired ? "No past prescriptions" : "No active prescriptions")
         : ListView.builder(
-      shrinkWrap: true, // Allows it to be inside a Column without overflowing
-      physics: const NeverScrollableScrollPhysics(), // Disables separate scrolling
+      shrinkWrap: true, // Allow it to be inside the Column without overflowing
+      physics: const NeverScrollableScrollPhysics(), // Disables the separate scrolling
       itemCount: prescriptions.length,
       itemBuilder: (context, index) {
         final prescription = prescriptions[index];

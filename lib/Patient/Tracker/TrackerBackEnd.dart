@@ -3,7 +3,7 @@ import '../../data/database.dart';
 class TrackerBackEnd {
   final AppDatabase db = AppDatabase();
 
-  // Get today's scheduled medications
+  // get today scheduled meds
   Future<List<Map<String, dynamic>>> getTodaysSchedule(String nationalId) async {
     final prescriptions = await db.GetUserPrescriptions(nationalId);
     List<Map<String, dynamic>> schedule = [];

@@ -18,19 +18,18 @@ class _PrescriptionSentSuccessfullyState
   late final Animation<double> _subtextFade;
 
   bool _showPrescription = true;
-  bool _showShop = true; // <-- new flag
+  bool _showShop = true;
 
   @override
   void initState() {
     super.initState();
 
-    // Master timeline (3s)
     _ctrl = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 3000),
     )..forward();
 
-    // Move prescription up
+    // Move presc up
     _prescAlign = AlignmentTween(
       begin: Alignment(0, 1.2),
       end: Alignment.center,
@@ -39,30 +38,30 @@ class _PrescriptionSentSuccessfullyState
       curve: Interval(0.0, 0.4, curve: Curves.easeInOut),
     ));
 
-    // Bounce-check
+
     _checkScale = CurvedAnimation(
       parent: _ctrl,
       curve: Interval(0.4, 0.6, curve: Curves.elasticOut),
     );
 
-    // Fade in heading
+    // Fade
     _headingFade = CurvedAnimation(
       parent: _ctrl,
       curve: Interval(0.6, 0.8, curve: Curves.easeIn),
     );
 
-    // Fade in subtext & button
+    // Fade
     _subtextFade = CurvedAnimation(
       parent: _ctrl,
       curve: Interval(0.8, 1.0, curve: Curves.easeIn),
     );
 
-    // When the paper reaches the center (40%), hide both the paper and the shop
+    // hide presc and pharmacy
     _ctrl.addListener(() {
       if (_ctrl.value >= 0.4 && _showPrescription) {
         setState(() {
           _showPrescription = false;
-          _showShop = false;  // <-- hide shop at the same moment
+          _showShop = false;
         });
       }
     });
@@ -89,7 +88,6 @@ class _PrescriptionSentSuccessfullyState
         ),
         child: Stack(
           children: [
-            // 1) Shop icon only if _showShop is true
             if (_showShop)
               Align(
                 alignment: Alignment.center,
@@ -100,7 +98,6 @@ class _PrescriptionSentSuccessfullyState
                 ),
               ),
 
-            // 2) Prescription flying up, disappears on arrival
             if (_showPrescription)
               AlignTransition(
                 alignment: _prescAlign,
@@ -115,7 +112,6 @@ class _PrescriptionSentSuccessfullyState
                 ),
               ),
 
-            // 3) Check bounce at the shop location
             Align(
               alignment: Alignment.center,
               child: ScaleTransition(
@@ -128,7 +124,6 @@ class _PrescriptionSentSuccessfullyState
               ),
             ),
 
-            // 4) Text and button BELOW the shop
             Align(
               alignment: Alignment(0, 0.6),
               child: Column(
