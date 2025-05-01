@@ -1,7 +1,10 @@
 import 'package:prescripto/data/database.dart';
 import 'package:drift/drift.dart';
+import 'package:prescripto/services/InfuraService.dart';
 
 class PrescriptionService {
+  // create instance from the integration service (Blockchain) that handles infura library
+  static final InfuraService _infura = InfuraService();
   /// إحضار قائمة المرضى من قاعدة البيانات
   /// نفترض أنّ المرضى لهم دور (role = 'patient')
   static Future<List<Map<String, dynamic>>> fetchPatients(AppDatabase db) async {
@@ -33,7 +36,8 @@ class PrescriptionService {
     required int physicianId,
     required String instructions,
     required List<Map<String, dynamic>> medications, required String pharmacyAddress, required String pharmacyName,
-  }) async {
+        required bool includesControlled,}) async {
+
     try {
       // أولاً: نضيف سجّل الوصفة الرئيسي في جدول Prescriptions
       final prescriptionId = await db.into(db.prescriptions).insert(
@@ -45,6 +49,27 @@ class PrescriptionService {
         ),
       );
 
+      if (includesControlled) {
+        try {
+          final txHash = await _infura.logPrescriptionOnChain(
+            from: '<YOUR_WALLET_ADDRESS>',       // ex: '0xAbC123…'
+            to: '<YOUR_CONTRACT_OR_NULL>',       // optional
+            prescriptionId: prescriptionId,
+            patientId: patientId,
+            includesControlled: true,
+
+          );
+          await db.into(db.blockchainTransactions).insert(
+              BlockchainTransactionsCompanion.insert(
+                prescriptionId: prescriptionId,
+                transactionHash: txHash,
+              ));
+          print('Prescription logged on-chain: $txHash');
+        } catch (e) {
+          print('Blockchain logging failed: $e');
+        }
+
+      }
       // ثانيًا: نضيف العناصر (الأدوية) في جدول PrescriptionItems
       for (final med in medications) {
         await db.into(db.prescriptionItems).insert(

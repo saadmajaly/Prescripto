@@ -20,6 +20,8 @@ class _NewPrescriptionState extends State<NewPrescription> {
 
   final List<String> refills = ['0', '1', '2', '3', '4+'];
   final List<String> dawOptions = ['Yes', 'No'];
+  bool _includesControlled = true;
+  List<bool> _toggleSelections = [true, false];
 
   // Prescription list (without pharmacy fields)
   List<Map<String, dynamic>> prescriptions = [
@@ -77,6 +79,7 @@ class _NewPrescriptionState extends State<NewPrescription> {
 
       bool success = await PrescriptionService.submitPrescription(
         db,
+        includesControlled: _includesControlled,
         patientId: int.parse(selectedPatient!),
         physicianId: 1, // TODO: use actual logged-in physician ID
         instructions: prescription['instructions'].text,
@@ -86,6 +89,7 @@ class _NewPrescriptionState extends State<NewPrescription> {
             'dosage': prescription['drugName'].text,
             'frequency': prescription['instructions'].text,
             'quantity': 10,
+
           }
         ],
         pharmacyName: pharmacyNameController.text,
@@ -132,6 +136,84 @@ class _NewPrescriptionState extends State<NewPrescription> {
                     const SizedBox(height: 12),
                     _buildTextField('Pharmacy Address', pharmacyAddressController),
                     const SizedBox(height: 20),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade400, width: 1),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Row(
+                        children: [
+                          // Left half
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _toggleSelections = [true, false];
+                                  _includesControlled = true;
+                                });
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: _toggleSelections[0]
+                                      ? Theme.of(context).primaryColor.withOpacity(0.1)
+                                      : Colors.transparent,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(24),
+                                    bottomLeft: Radius.circular(24),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Includes Controlled Medications',
+                                  style: TextStyle(
+                                    color: _toggleSelections[0]
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          // Right half
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _toggleSelections = [false, true];
+                                  _includesControlled = false;
+                                });
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: _toggleSelections[1]
+                                      ? Theme.of(context).primaryColor.withOpacity(0.1)
+                                      : Colors.transparent,
+                                  borderRadius: const BorderRadius.only(
+                                    topRight: Radius.circular(24),
+                                    bottomRight: Radius.circular(24),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Without Controlled Medications',
+                                  style: TextStyle(
+                                    color: _toggleSelections[1]
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+
 
                     _buildPrescriptions(),
 
@@ -229,7 +311,7 @@ class _NewPrescriptionState extends State<NewPrescription> {
             onTap: ()=> Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => HelpPage()),
-            ), 
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.logout_outlined),
