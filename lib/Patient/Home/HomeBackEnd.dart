@@ -72,4 +72,6 @@ class HomeBackEnd {
     }
     return activeMeds;
   }
+
+  searchPrescriptions(String query) {}
 }

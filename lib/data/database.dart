@@ -671,4 +671,6 @@ class AppDatabase extends _$AppDatabase {
       );
     }
   }
+
+  getAllPrescriptions() {}
 }

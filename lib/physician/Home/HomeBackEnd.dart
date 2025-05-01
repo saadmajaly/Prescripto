@@ -1,5 +1,4 @@
 import 'package:prescripto/data/database.dart';
-import 'package:drift/drift.dart';
 
 /// Data model that holds the count of patients, prescriptions, and the fetch timestamp.
 class HomeStats {
@@ -15,7 +14,7 @@ class HomeStats {
 }
 
 /// Backend service for the physician home page.
-/// Provides statistics and recent activity from the database.
+/// Provides statistics, search, and recent activity from the database.
 class HomeBackend {
   final AppDatabase _db;
 
@@ -59,5 +58,59 @@ class HomeBackend {
     }
 
     return dailyCounts;
+  }
+
+  /// Search prescriptions by ID, instructions, patient name, or medication name (case-insensitive).
+  Future<List<Prescription>> searchPrescriptions(String query) async {
+    final prescriptions = await _db.GetAllPrescriptions();
+    final patients = await _db.getAllPatients();
+    final medications = await _db.select(_db.medications).get();
+
+    final itemsByPrescription = <int, List<PrescriptionItem>>{};
+
+    for (var p in prescriptions) {
+      itemsByPrescription[p.prescriptionId] =
+          await _db.GetPrescriptionItems(p.prescriptionId);
+    }
+
+    return prescriptions.where((p) {
+      final idMatch = p.prescriptionId.toString().contains(query);
+      final instructionsMatch = (p.instructions ?? '').toLowerCase().contains(query.toLowerCase());
+
+      // Match patient name
+      final patient = patients.firstWhere(
+        (u) => u.id == p.patientId,
+        orElse: () => User(
+          id: -1,
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          nationalId: '',
+          passwordHash: '',
+          role: '',
+          createdAt: DateTime.now(),
+        ),
+      );
+      final patientNameMatch =
+          '${patient.firstName} ${patient.lastName}'.toLowerCase().contains(query.toLowerCase());
+
+      // Match medication names
+      final medNameMatch = (itemsByPrescription[p.prescriptionId] ?? []).any((item) {
+        final med = medications.firstWhere(
+          (m) => m.medicationId == item.medicationId,
+          orElse: () => Medication(
+            medicationId: -1,
+            name: '',
+            description: null,
+            controlledSubstance: false,
+          ),
+        );
+        return med.name.toLowerCase().contains(query.toLowerCase());
+      });
+
+      return idMatch || instructionsMatch || patientNameMatch || medNameMatch;
+    }).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 }

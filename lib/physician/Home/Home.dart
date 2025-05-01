@@ -8,7 +8,6 @@ import 'package:prescripto/physician/Home/HomeBackEnd.dart';
 import 'package:prescripto/data/database.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-/// Main screen for physician user with dynamic data loading
 class physicianHome extends StatefulWidget {
   const physicianHome({Key? key}) : super(key: key);
 
@@ -34,7 +33,7 @@ class _PhysicianHomeState extends State<physicianHome> {
       backgroundColor: const Color(0xFFF5F5F5),
       body: Row(
         children: [
-          // Sidebar navigation panel
+          // Sidebar
           Container(
             width: 200,
             color: Colors.indigo[200],
@@ -73,6 +72,7 @@ class _PhysicianHomeState extends State<physicianHome> {
               ],
             ),
           ),
+          // Main area
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -115,7 +115,7 @@ class _PhysicianHomeState extends State<physicianHome> {
                       children: [
                         Expanded(flex: 2, child: _buildChart()),
                         const SizedBox(width: 20),
-                        Expanded(flex: 2, child: _buildPlaceholder(height: 180, label: 'Productivity Chart')),
+                        Expanded(flex: 2, child: _buildProductivityChart()),
                       ],
                     ),
                   ),
@@ -174,12 +174,49 @@ class _PhysicianHomeState extends State<physicianHome> {
                 FlSpot(6, 1.8),
               ],
               isCurved: true,
-       color: Colors.indigo,
+              color: Colors.indigo,
               barWidth: 4,
               isStrokeCapRound: true,
               belowBarData: BarAreaData(show: false),
               dotData: FlDotData(show: false),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProductivityChart() {
+    return Container(
+      height: 180,
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+      padding: const EdgeInsets.all(16),
+      child: BarChart(
+        BarChartData(
+          alignment: BarChartAlignment.spaceAround,
+          borderData: FlBorderData(show: false),
+          titlesData: FlTitlesData(
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, _) {
+                  final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                  return Text(days[value.toInt() % 7], style: const TextStyle(fontSize: 10));
+                },
+              ),
+            ),
+            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          ),
+          barGroups: [
+            BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 3, color: Colors.indigo)]),
+            BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 5, color: Colors.indigo)]),
+            BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 4, color: Colors.indigo)]),
+            BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 6, color: Colors.indigo)]),
+            BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 2, color: Colors.indigo)]),
+            BarChartGroupData(x: 5, barRods: [BarChartRodData(toY: 7, color: Colors.indigo)]),
+            BarChartGroupData(x: 6, barRods: [BarChartRodData(toY: 5, color: Colors.indigo)]),
           ],
         ),
       ),
@@ -225,10 +262,7 @@ class StatCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ),
               Icon(topRightIcon, size: 20, color: Colors.grey[400]),
@@ -237,18 +271,12 @@ class StatCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           Text(
             footnote,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -256,10 +284,41 @@ class StatCard extends StatelessWidget {
   }
 }
 
-class RecentPrescriptions extends StatelessWidget {
+class RecentPrescriptions extends StatefulWidget {
   final List<Prescription> prescriptions;
 
   const RecentPrescriptions({Key? key, required this.prescriptions}) : super(key: key);
+
+  @override
+  State<RecentPrescriptions> createState() => _RecentPrescriptionsState();
+}
+
+class _RecentPrescriptionsState extends State<RecentPrescriptions> {
+  final HomeBackend _backend = HomeBackend();
+  List<Prescription> _filtered = [];
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _filtered = widget.prescriptions;
+  }
+
+  void _search(String query) async {
+    setState(() => _loading = true);
+    if (query.trim().isEmpty) {
+      setState(() {
+        _filtered = widget.prescriptions;
+        _loading = false;
+      });
+    } else {
+      final results = await _backend.searchPrescriptions(query);
+      setState(() {
+        _filtered = results;
+        _loading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -277,32 +336,29 @@ class RecentPrescriptions extends StatelessWidget {
               filled: true,
               fillColor: Colors.grey[100],
             ),
+            onChanged: _search,
           ),
           const SizedBox(height: 16),
-          Expanded(
-            child: ListView.builder(
-              itemCount: prescriptions.length,
-              itemBuilder: (context, index) {
-                final item = prescriptions[index];
-                return ListTile(
-                  leading: const Icon(Icons.description, color: Colors.indigo),
-                  title: Text('#${item.prescriptionId}'),
-                  subtitle: Text('Created ${item.createdAt}'),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                );
-              },
-            ),
-          ),
+          _loading
+              ? const Expanded(child: Center(child: CircularProgressIndicator()))
+              : Expanded(
+                  child: _filtered.isEmpty
+                      ? const Center(child: Text('No matching prescriptions found.'))
+                      : ListView.builder(
+                          itemCount: _filtered.length,
+                          itemBuilder: (context, index) {
+                            final item = _filtered[index];
+                            return ListTile(
+                              leading: const Icon(Icons.description, color: Colors.indigo),
+                              title: Text('#${item.prescriptionId}'),
+                              subtitle: Text(item.instructions ?? 'No instructions'),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                            );
+                          },
+                        ),
+                ),
         ],
       ),
     );
   }
-}
-
-Widget _buildPlaceholder({required double height, required String label}) {
-  return Container(
-    height: height,
-    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-    child: Center(child: Text(label, style: const TextStyle(color: Colors.grey))),
-  );
 }
