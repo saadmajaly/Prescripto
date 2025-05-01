@@ -1,81 +1,63 @@
 import 'package:prescripto/data/database.dart';
 import 'package:drift/drift.dart';
 
-class PrescriptionSummary {
-  final int id;
-  final DateTime createdAt;
-  final String formattedTime;
-  final String? patientName;
+/// Data model that holds the count of patients, prescriptions, and the fetch timestamp.
+class HomeStats {
+  final int patientCount;
+  final int prescriptionCount;
+  final DateTime fetchedAt;
 
-  PrescriptionSummary({
-    required this.id,
-    required this.createdAt,
-    required this.formattedTime,
-    this.patientName,
+  HomeStats({
+    required this.patientCount,
+    required this.prescriptionCount,
+    required this.fetchedAt,
   });
 }
 
-class HomeBackEnd {
-  final AppDatabase db;
+/// Backend service for the physician home page.
+/// Provides statistics and recent activity from the database.
+class HomeBackend {
+  final AppDatabase _db;
 
-  HomeBackEnd(this.db);
+  /// Optionally accepts a test database, otherwise uses the singleton instance.
+  HomeBackend([AppDatabase? db]) : _db = db ?? AppDatabase();
 
-  // Load prescriptions created by the physician (using their national ID)
-  Future<List<PrescriptionSummary>> loadPrescriptions(String physicianNatId) async {
-    final physician = await (db.select(db.users)
-          ..where((u) => u.nationalId.equals(physicianNatId) & u.role.equals("physician")))
-        .getSingleOrNull();
+  /// Returns general statistics including total patients and prescriptions.
+  Future<HomeStats> fetchStats() async {
+    final patients = await _db.getAllPatients();
+    final prescriptions = await _db.GetAllPrescriptions();
 
-    if (physician == null) return [];
-final query = db.select(db.prescriptions)
-  ..where((p) => p.physicianId.equals(physician.id));
-
-query.orderBy([
-  (p) => OrderingTerm(expression: p.createdAt, mode: OrderingMode.desc),
-]);
-
-final presList = await query.get();
-
-
-    // Get the related patient names
-    final patientIds = presList.map((p) => p.patientId).toSet().toList();
-    final patients = await (db.select(db.users)
-          ..where((u) => db.users.id.isIn(patientIds)))
-        .get();
-
-    final patientMap = {
-      for (var p in patients) p.id: '${p.firstName} ${p.lastName}'
-    };
-
-    return presList.map((p) {
-      return PrescriptionSummary(
-        id: p.prescriptionId,
-        createdAt: p.createdAt,
-        formattedTime: _relativeTime(p.createdAt),
-        patientName: patientMap[p.patientId],
-      );
-    }).toList();
+    return HomeStats(
+      patientCount: patients.length,
+      prescriptionCount: prescriptions.length,
+      fetchedAt: DateTime.now(),
+    );
   }
 
-  // Filter prescriptions by search text
-  List<PrescriptionSummary> filterPrescriptions(
-      List<PrescriptionSummary> all, String query) {
-    final q = query.toLowerCase();
-    return all.where((p) {
-      return p.id.toString().contains(q) ||
-          (p.patientName?.toLowerCase().contains(q) ?? false);
-    }).toList();
+  /// Fetches all prescriptions sorted from newest to oldest.
+  Future<List<Prescription>> fetchRecentPrescriptions() async {
+    return (await _db.GetAllPrescriptions())
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
-  // Helper to convert datetime into "2 days ago"
-  String _relativeTime(DateTime dt) {
+  /// Returns a list of prescription counts for the past 7 days.
+  /// Each index represents one day, ordered from oldest to newest.
+  Future<List<int>> fetchWeeklyPrescriptionCounts() async {
     final now = DateTime.now();
-    final diff = now.difference(dt);
+    final allPrescriptions = await _db.GetAllPrescriptions();
 
-    if (diff.inDays >= 30) return 'Created 1 month ago';
-    if (diff.inDays >= 7) return 'Created ${diff.inDays ~/ 7} week(s) ago';
-    if (diff.inDays > 0) return 'Created ${diff.inDays} day(s) ago';
-    if (diff.inHours > 0) return 'Created ${diff.inHours} hour(s) ago';
-    return 'Created just now';
+    List<int> dailyCounts = List.filled(7, 0);
+
+    for (final p in allPrescriptions) {
+      final created = p.createdAt;
+      final dayDiff = now.difference(DateTime(created.year, created.month, created.day)).inDays;
+
+      // Only consider prescriptions created within the last 7 days
+      if (dayDiff >= 0 && dayDiff <= 6) {
+        dailyCounts[6 - dayDiff] += 1; // Store in reverse order: oldest → newest
+      }
+    }
+
+    return dailyCounts;
   }
 }
