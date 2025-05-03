@@ -450,6 +450,7 @@ class AppDatabase extends _$AppDatabase {
         syndicateNumber: Value('PHARM-${2000}'),
         passwordHash: 'test',
         role: 'pharmacist',
+        //pharmacyid: '1',
       ),
     );
 
