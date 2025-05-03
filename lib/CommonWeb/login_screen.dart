@@ -4,6 +4,8 @@ import 'package:prescripto/physician/Home/Home.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../AuthLogic/AuthProvider.dart';
+import '../Patient/MainScreen.dart';
+import '../Pharmacist/MainScreen.dart';
 import 'signup_screen.dart'; // Import SignUpScreen
 
 class WebLoginPage extends StatefulWidget {
@@ -44,7 +46,7 @@ class _WebLoginPageState extends State<WebLoginPage>
           } else if (prefs.getString("userRole") == "pharmacist") {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => PharmacistHome()),
+              MaterialPageRoute(builder: (context) => PharmacistHomeScreen()),
             );
           }
         } else {
