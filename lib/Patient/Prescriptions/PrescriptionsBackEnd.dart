@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+
 import '../../data/database.dart';
 
 class PrescriptionsBackEnd {
@@ -10,7 +12,7 @@ class PrescriptionsBackEnd {
 
     // Get the user prescriptions
     final prescriptions = await (db.select(db.prescriptions)
-      ..where((p) => p.patientId.equals(user.id)))
+      ..where((p) => p.patientId.equals(user.id) & p.status.equals('pending')))
         .get();
 
     List<Map<String, dynamic>> activePrescriptions = [];
@@ -48,4 +50,5 @@ class PrescriptionsBackEnd {
 
     return {"active": activePrescriptions, "past": pastPrescriptions};
   }
+
 }

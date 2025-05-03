@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:prescripto/Patient/Home/Home.dart';
 import 'package:prescripto/Patient/MainScreen.dart';
+import 'package:prescripto/Patient/Prescriptions/Prescriptions.dart';
 
 class PrescriptionSentSuccessfully extends StatefulWidget {
   @override
@@ -160,7 +161,7 @@ class _PrescriptionSentSuccessfullyState
                   FadeTransition(
                     opacity: _subtextFade,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => MainScreen())),
+                      onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => Prescriptions())),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue.shade700,
                         padding:

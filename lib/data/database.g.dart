@@ -46,11 +46,11 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
   @override
   late final GeneratedColumn<String> phone = GeneratedColumn<String>(
-      'phone', aliasedName, true,
+      'phone', aliasedName, false,
       additionalChecks:
           GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 20),
       type: DriftSqlType.string,
-      requiredDuringInsert: false);
+      requiredDuringInsert: true);
   static const VerificationMeta _nationalIdMeta =
       const VerificationMeta('nationalId');
   @override
@@ -135,6 +135,8 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     if (data.containsKey('phone')) {
       context.handle(
           _phoneMeta, phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta));
+    } else if (isInserting) {
+      context.missing(_phoneMeta);
     }
     if (data.containsKey('national_id')) {
       context.handle(
@@ -186,7 +188,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
       email: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}email'])!,
       phone: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}phone']),
+          .read(DriftSqlType.string, data['${effectivePrefix}phone'])!,
       nationalId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}national_id'])!,
       syndicateNumber: attachedDatabase.typeMapping.read(
@@ -211,7 +213,7 @@ class User extends DataClass implements Insertable<User> {
   final String firstName;
   final String lastName;
   final String email;
-  final String? phone;
+  final String phone;
   final String nationalId;
   final String? syndicateNumber;
   final String passwordHash;
@@ -222,7 +224,7 @@ class User extends DataClass implements Insertable<User> {
       required this.firstName,
       required this.lastName,
       required this.email,
-      this.phone,
+      required this.phone,
       required this.nationalId,
       this.syndicateNumber,
       required this.passwordHash,
@@ -235,9 +237,7 @@ class User extends DataClass implements Insertable<User> {
     map['first_name'] = Variable<String>(firstName);
     map['last_name'] = Variable<String>(lastName);
     map['email'] = Variable<String>(email);
-    if (!nullToAbsent || phone != null) {
-      map['phone'] = Variable<String>(phone);
-    }
+    map['phone'] = Variable<String>(phone);
     map['national_id'] = Variable<String>(nationalId);
     if (!nullToAbsent || syndicateNumber != null) {
       map['syndicate_number'] = Variable<String>(syndicateNumber);
@@ -254,8 +254,7 @@ class User extends DataClass implements Insertable<User> {
       firstName: Value(firstName),
       lastName: Value(lastName),
       email: Value(email),
-      phone:
-          phone == null && nullToAbsent ? const Value.absent() : Value(phone),
+      phone: Value(phone),
       nationalId: Value(nationalId),
       syndicateNumber: syndicateNumber == null && nullToAbsent
           ? const Value.absent()
@@ -274,7 +273,7 @@ class User extends DataClass implements Insertable<User> {
       firstName: serializer.fromJson<String>(json['firstName']),
       lastName: serializer.fromJson<String>(json['lastName']),
       email: serializer.fromJson<String>(json['email']),
-      phone: serializer.fromJson<String?>(json['phone']),
+      phone: serializer.fromJson<String>(json['phone']),
       nationalId: serializer.fromJson<String>(json['nationalId']),
       syndicateNumber: serializer.fromJson<String?>(json['syndicateNumber']),
       passwordHash: serializer.fromJson<String>(json['passwordHash']),
@@ -290,7 +289,7 @@ class User extends DataClass implements Insertable<User> {
       'firstName': serializer.toJson<String>(firstName),
       'lastName': serializer.toJson<String>(lastName),
       'email': serializer.toJson<String>(email),
-      'phone': serializer.toJson<String?>(phone),
+      'phone': serializer.toJson<String>(phone),
       'nationalId': serializer.toJson<String>(nationalId),
       'syndicateNumber': serializer.toJson<String?>(syndicateNumber),
       'passwordHash': serializer.toJson<String>(passwordHash),
@@ -304,7 +303,7 @@ class User extends DataClass implements Insertable<User> {
           String? firstName,
           String? lastName,
           String? email,
-          Value<String?> phone = const Value.absent(),
+          String? phone,
           String? nationalId,
           Value<String?> syndicateNumber = const Value.absent(),
           String? passwordHash,
@@ -315,7 +314,7 @@ class User extends DataClass implements Insertable<User> {
         firstName: firstName ?? this.firstName,
         lastName: lastName ?? this.lastName,
         email: email ?? this.email,
-        phone: phone.present ? phone.value : this.phone,
+        phone: phone ?? this.phone,
         nationalId: nationalId ?? this.nationalId,
         syndicateNumber: syndicateNumber.present
             ? syndicateNumber.value
@@ -385,7 +384,7 @@ class UsersCompanion extends UpdateCompanion<User> {
   final Value<String> firstName;
   final Value<String> lastName;
   final Value<String> email;
-  final Value<String?> phone;
+  final Value<String> phone;
   final Value<String> nationalId;
   final Value<String?> syndicateNumber;
   final Value<String> passwordHash;
@@ -408,7 +407,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     required String firstName,
     required String lastName,
     required String email,
-    this.phone = const Value.absent(),
+    required String phone,
     required String nationalId,
     this.syndicateNumber = const Value.absent(),
     required String passwordHash,
@@ -417,6 +416,7 @@ class UsersCompanion extends UpdateCompanion<User> {
   })  : firstName = Value(firstName),
         lastName = Value(lastName),
         email = Value(email),
+        phone = Value(phone),
         nationalId = Value(nationalId),
         passwordHash = Value(passwordHash),
         role = Value(role);
@@ -451,7 +451,7 @@ class UsersCompanion extends UpdateCompanion<User> {
       Value<String>? firstName,
       Value<String>? lastName,
       Value<String>? email,
-      Value<String?>? phone,
+      Value<String>? phone,
       Value<String>? nationalId,
       Value<String?>? syndicateNumber,
       Value<String>? passwordHash,
@@ -3869,6 +3869,230 @@ class BlockchainTransactionsCompanion
   }
 }
 
+class $PharmacistTable extends Pharmacist
+    with TableInfo<$PharmacistTable, PharmacistData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PharmacistTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _pharmacyIdMeta =
+      const VerificationMeta('pharmacyId');
+  @override
+  late final GeneratedColumn<int> pharmacyId = GeneratedColumn<int>(
+      'pharmacy_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _pharmacistIdMeta =
+      const VerificationMeta('pharmacistId');
+  @override
+  late final GeneratedColumn<int> pharmacistId = GeneratedColumn<int>(
+      'pharmacist_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [id, pharmacyId, pharmacistId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pharmacist';
+  @override
+  VerificationContext validateIntegrity(Insertable<PharmacistData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('pharmacy_id')) {
+      context.handle(
+          _pharmacyIdMeta,
+          pharmacyId.isAcceptableOrUnknown(
+              data['pharmacy_id']!, _pharmacyIdMeta));
+    } else if (isInserting) {
+      context.missing(_pharmacyIdMeta);
+    }
+    if (data.containsKey('pharmacist_id')) {
+      context.handle(
+          _pharmacistIdMeta,
+          pharmacistId.isAcceptableOrUnknown(
+              data['pharmacist_id']!, _pharmacistIdMeta));
+    } else if (isInserting) {
+      context.missing(_pharmacistIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PharmacistData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PharmacistData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      pharmacyId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}pharmacy_id'])!,
+      pharmacistId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}pharmacist_id'])!,
+    );
+  }
+
+  @override
+  $PharmacistTable createAlias(String alias) {
+    return $PharmacistTable(attachedDatabase, alias);
+  }
+}
+
+class PharmacistData extends DataClass implements Insertable<PharmacistData> {
+  final int id;
+  final int pharmacyId;
+  final int pharmacistId;
+  const PharmacistData(
+      {required this.id, required this.pharmacyId, required this.pharmacistId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['pharmacy_id'] = Variable<int>(pharmacyId);
+    map['pharmacist_id'] = Variable<int>(pharmacistId);
+    return map;
+  }
+
+  PharmacistCompanion toCompanion(bool nullToAbsent) {
+    return PharmacistCompanion(
+      id: Value(id),
+      pharmacyId: Value(pharmacyId),
+      pharmacistId: Value(pharmacistId),
+    );
+  }
+
+  factory PharmacistData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PharmacistData(
+      id: serializer.fromJson<int>(json['id']),
+      pharmacyId: serializer.fromJson<int>(json['pharmacyId']),
+      pharmacistId: serializer.fromJson<int>(json['pharmacistId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'pharmacyId': serializer.toJson<int>(pharmacyId),
+      'pharmacistId': serializer.toJson<int>(pharmacistId),
+    };
+  }
+
+  PharmacistData copyWith({int? id, int? pharmacyId, int? pharmacistId}) =>
+      PharmacistData(
+        id: id ?? this.id,
+        pharmacyId: pharmacyId ?? this.pharmacyId,
+        pharmacistId: pharmacistId ?? this.pharmacistId,
+      );
+  PharmacistData copyWithCompanion(PharmacistCompanion data) {
+    return PharmacistData(
+      id: data.id.present ? data.id.value : this.id,
+      pharmacyId:
+          data.pharmacyId.present ? data.pharmacyId.value : this.pharmacyId,
+      pharmacistId: data.pharmacistId.present
+          ? data.pharmacistId.value
+          : this.pharmacistId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PharmacistData(')
+          ..write('id: $id, ')
+          ..write('pharmacyId: $pharmacyId, ')
+          ..write('pharmacistId: $pharmacistId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, pharmacyId, pharmacistId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PharmacistData &&
+          other.id == this.id &&
+          other.pharmacyId == this.pharmacyId &&
+          other.pharmacistId == this.pharmacistId);
+}
+
+class PharmacistCompanion extends UpdateCompanion<PharmacistData> {
+  final Value<int> id;
+  final Value<int> pharmacyId;
+  final Value<int> pharmacistId;
+  const PharmacistCompanion({
+    this.id = const Value.absent(),
+    this.pharmacyId = const Value.absent(),
+    this.pharmacistId = const Value.absent(),
+  });
+  PharmacistCompanion.insert({
+    this.id = const Value.absent(),
+    required int pharmacyId,
+    required int pharmacistId,
+  })  : pharmacyId = Value(pharmacyId),
+        pharmacistId = Value(pharmacistId);
+  static Insertable<PharmacistData> custom({
+    Expression<int>? id,
+    Expression<int>? pharmacyId,
+    Expression<int>? pharmacistId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (pharmacyId != null) 'pharmacy_id': pharmacyId,
+      if (pharmacistId != null) 'pharmacist_id': pharmacistId,
+    });
+  }
+
+  PharmacistCompanion copyWith(
+      {Value<int>? id, Value<int>? pharmacyId, Value<int>? pharmacistId}) {
+    return PharmacistCompanion(
+      id: id ?? this.id,
+      pharmacyId: pharmacyId ?? this.pharmacyId,
+      pharmacistId: pharmacistId ?? this.pharmacistId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (pharmacyId.present) {
+      map['pharmacy_id'] = Variable<int>(pharmacyId.value);
+    }
+    if (pharmacistId.present) {
+      map['pharmacist_id'] = Variable<int>(pharmacistId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PharmacistCompanion(')
+          ..write('id: $id, ')
+          ..write('pharmacyId: $pharmacyId, ')
+          ..write('pharmacistId: $pharmacistId')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3888,6 +4112,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $PharmacyInsurancesTable(this);
   late final $BlockchainTransactionsTable blockchainTransactions =
       $BlockchainTransactionsTable(this);
+  late final $PharmacistTable pharmacist = $PharmacistTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3904,7 +4129,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         emergencyAccessRequests,
         insurances,
         pharmacyInsurances,
-        blockchainTransactions
+        blockchainTransactions,
+        pharmacist
       ];
 }
 
@@ -3913,7 +4139,7 @@ typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
   required String firstName,
   required String lastName,
   required String email,
-  Value<String?> phone,
+  required String phone,
   required String nationalId,
   Value<String?> syndicateNumber,
   required String passwordHash,
@@ -3925,7 +4151,7 @@ typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
   Value<String> firstName,
   Value<String> lastName,
   Value<String> email,
-  Value<String?> phone,
+  Value<String> phone,
   Value<String> nationalId,
   Value<String?> syndicateNumber,
   Value<String> passwordHash,
@@ -4082,7 +4308,7 @@ class $$UsersTableTableManager extends RootTableManager<
             Value<String> firstName = const Value.absent(),
             Value<String> lastName = const Value.absent(),
             Value<String> email = const Value.absent(),
-            Value<String?> phone = const Value.absent(),
+            Value<String> phone = const Value.absent(),
             Value<String> nationalId = const Value.absent(),
             Value<String?> syndicateNumber = const Value.absent(),
             Value<String> passwordHash = const Value.absent(),
@@ -4106,7 +4332,7 @@ class $$UsersTableTableManager extends RootTableManager<
             required String firstName,
             required String lastName,
             required String email,
-            Value<String?> phone = const Value.absent(),
+            required String phone,
             required String nationalId,
             Value<String?> syndicateNumber = const Value.absent(),
             required String passwordHash,
@@ -5962,6 +6188,142 @@ typedef $$BlockchainTransactionsTableProcessedTableManager
         ),
         BlockchainTransaction,
         PrefetchHooks Function()>;
+typedef $$PharmacistTableCreateCompanionBuilder = PharmacistCompanion Function({
+  Value<int> id,
+  required int pharmacyId,
+  required int pharmacistId,
+});
+typedef $$PharmacistTableUpdateCompanionBuilder = PharmacistCompanion Function({
+  Value<int> id,
+  Value<int> pharmacyId,
+  Value<int> pharmacistId,
+});
+
+class $$PharmacistTableFilterComposer
+    extends Composer<_$AppDatabase, $PharmacistTable> {
+  $$PharmacistTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get pharmacyId => $composableBuilder(
+      column: $table.pharmacyId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get pharmacistId => $composableBuilder(
+      column: $table.pharmacistId, builder: (column) => ColumnFilters(column));
+}
+
+class $$PharmacistTableOrderingComposer
+    extends Composer<_$AppDatabase, $PharmacistTable> {
+  $$PharmacistTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get pharmacyId => $composableBuilder(
+      column: $table.pharmacyId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get pharmacistId => $composableBuilder(
+      column: $table.pharmacistId,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$PharmacistTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PharmacistTable> {
+  $$PharmacistTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get pharmacyId => $composableBuilder(
+      column: $table.pharmacyId, builder: (column) => column);
+
+  GeneratedColumn<int> get pharmacistId => $composableBuilder(
+      column: $table.pharmacistId, builder: (column) => column);
+}
+
+class $$PharmacistTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $PharmacistTable,
+    PharmacistData,
+    $$PharmacistTableFilterComposer,
+    $$PharmacistTableOrderingComposer,
+    $$PharmacistTableAnnotationComposer,
+    $$PharmacistTableCreateCompanionBuilder,
+    $$PharmacistTableUpdateCompanionBuilder,
+    (
+      PharmacistData,
+      BaseReferences<_$AppDatabase, $PharmacistTable, PharmacistData>
+    ),
+    PharmacistData,
+    PrefetchHooks Function()> {
+  $$PharmacistTableTableManager(_$AppDatabase db, $PharmacistTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PharmacistTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PharmacistTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PharmacistTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> pharmacyId = const Value.absent(),
+            Value<int> pharmacistId = const Value.absent(),
+          }) =>
+              PharmacistCompanion(
+            id: id,
+            pharmacyId: pharmacyId,
+            pharmacistId: pharmacistId,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int pharmacyId,
+            required int pharmacistId,
+          }) =>
+              PharmacistCompanion.insert(
+            id: id,
+            pharmacyId: pharmacyId,
+            pharmacistId: pharmacistId,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$PharmacistTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $PharmacistTable,
+    PharmacistData,
+    $$PharmacistTableFilterComposer,
+    $$PharmacistTableOrderingComposer,
+    $$PharmacistTableAnnotationComposer,
+    $$PharmacistTableCreateCompanionBuilder,
+    $$PharmacistTableUpdateCompanionBuilder,
+    (
+      PharmacistData,
+      BaseReferences<_$AppDatabase, $PharmacistTable, PharmacistData>
+    ),
+    PharmacistData,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5992,4 +6354,6 @@ class $AppDatabaseManager {
   $$BlockchainTransactionsTableTableManager get blockchainTransactions =>
       $$BlockchainTransactionsTableTableManager(
           _db, _db.blockchainTransactions);
+  $$PharmacistTableTableManager get pharmacist =>
+      $$PharmacistTableTableManager(_db, _db.pharmacist);
 }

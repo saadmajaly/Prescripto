@@ -3,157 +3,163 @@ import 'dart:math';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:drift/drift.dart';
-import "package:path_provider/path_provider.dart" show getApplicationSupportDirectory;
+import 'package:path_provider/path_provider.dart' show getApplicationSupportDirectory;
 part 'database.g.dart';
 
 // USERS: Holds patients, physicians, pharmacists, and admin.
 class Users extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get firstName => text().withLength(min: 1, max: 50)();
-  TextColumn get lastName => text().withLength(min: 1, max: 50)();
-  TextColumn get email => text().withLength(min: 1, max: 100)();
-  TextColumn get phone => text().withLength(min: 1, max: 20)();
-  TextColumn get nationalId => text().withLength(min: 1, max: 20)();
+  IntColumn get id               => integer().autoIncrement()();
+  TextColumn get firstName       => text().withLength(min: 1, max: 50)();
+  TextColumn get lastName        => text().withLength(min: 1, max: 50)();
+  TextColumn get email           => text().withLength(min: 1, max: 100)();
+  TextColumn get phone           => text().withLength(min: 1, max: 20)();
+  TextColumn get nationalId      => text().withLength(min: 1, max: 20)();
   TextColumn get syndicateNumber => text().nullable().withLength(min: 1, max: 20)();
-  TextColumn get passwordHash => text()();
-  TextColumn get role => text()();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  TextColumn get passwordHash    => text()();
+  TextColumn get role            => text()();
+  DateTimeColumn get createdAt   => dateTime().withDefault(currentDateAndTime)();
 }
 
 // PHARMACIES: Stores pharmacy details.
 class Pharmacies extends Table {
-  IntColumn get pharmacyId => integer().autoIncrement()();
-  TextColumn get name => text().withLength(min: 1, max: 100)();
-  TextColumn get address => text().nullable().withLength(min: 1, max: 255)();
-  TextColumn get phone => text().nullable().withLength(min: 1, max: 20)();
-  RealColumn get latitude => real().nullable()();
-  RealColumn get longitude => real().nullable()();
-  BoolColumn get acceptsInsurance => boolean().withDefault(const Constant(false))();
+  IntColumn get pharmacyId       => integer().autoIncrement()();
+  TextColumn get name            => text().withLength(min: 1, max: 100)();
+  TextColumn get address         => text().nullable().withLength(min: 1, max: 255)();
+  TextColumn get phone           => text().nullable().withLength(min: 1, max: 20)();
+  RealColumn get latitude        => real().nullable()();
+  RealColumn get longitude       => real().nullable()();
+  BoolColumn get acceptsInsurance=> boolean().withDefault(const Constant(false))();
+}
+
+class Pharmacist extends Table {
+  IntColumn get id              => integer().autoIncrement()();
+  IntColumn get pharmacyId      => integer()();
+  IntColumn get pharmacistId    => integer()();
+
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY(pharmacy_id)    REFERENCES pharmacies(pharmacy_id)',
+    'FOREIGN KEY(pharmacist_id)  REFERENCES users(id)'
+  ];
 }
 
 // MEDICATIONS: Master list of medications.
 class Medications extends Table {
-  IntColumn get medicationId => integer().autoIncrement()();
-  TextColumn get name => text().withLength(min: 1, max: 100)();
-  TextColumn get description => text().nullable().withLength(min: 1, max: 255)();
-  BoolColumn get controlledSubstance => boolean().withDefault(const Constant(false))();
+  IntColumn get medicationId        => integer().autoIncrement()();
+  TextColumn get name               => text().withLength(min: 1, max: 100)();
+  TextColumn get description        => text().nullable().withLength(min: 1, max: 255)();
+  BoolColumn get controlledSubstance=> boolean().withDefault(const Constant(false))();
 }
 
 // INVENTORY: Tracks stock of medications at each pharmacy.
 class Inventory extends Table {
-  IntColumn get inventoryId => integer().autoIncrement()();
-  IntColumn get pharmacyId => integer()();
-  IntColumn get medicationId => integer()();
-  IntColumn get quantity => integer().withDefault(const Constant(0))();
-  IntColumn get reorderThreshold => integer().withDefault(const Constant(0))();
-  RealColumn get price => real().withDefault(const Constant(0.0))();
+  IntColumn get inventoryId     => integer().autoIncrement()();
+  IntColumn get pharmacyId      => integer()();
+  IntColumn get medicationId    => integer()();
+  IntColumn get quantity        => integer().withDefault(const Constant(0))();
+  IntColumn get reorderThreshold=> integer().withDefault(const Constant(0))();
+  RealColumn get price          => real().withDefault(const Constant(0.0))();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(pharmacy_id) REFERENCES pharmacies(pharmacy_id)',
-    'FOREIGN KEY(medication_id) REFERENCES medications(medication_id)'
+    'FOREIGN KEY(pharmacy_id)    REFERENCES pharmacies(pharmacy_id)',
+    'FOREIGN KEY(medication_id)  REFERENCES medications(medication_id)'
   ];
 }
 
 // PRESCRIPTIONS: Records a prescription created by a physician.
 class Prescriptions extends Table {
-  IntColumn get prescriptionId => integer().autoIncrement()();
-  IntColumn get patientId => integer()();
-  IntColumn get physicianId => integer()();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  TextColumn get status => text().withDefault(const Constant('pending'))();
-  TextColumn get instructions => text().nullable()();
+  IntColumn get prescriptionId  => integer().autoIncrement()();
+  IntColumn get patientId       => integer()();
+  IntColumn get physicianId     => integer()();
+  DateTimeColumn get createdAt  => dateTime().withDefault(currentDateAndTime)();
+  TextColumn get status         => text().withDefault(const Constant('pending'))();
+  TextColumn get instructions   => text().nullable()();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(patient_id) REFERENCES users(id)',
-    'FOREIGN KEY(physician_id) REFERENCES users(id)'
+    'FOREIGN KEY(patient_id)     REFERENCES users(id)',
+    'FOREIGN KEY(physician_id)   REFERENCES users(id)'
   ];
 }
 
 class PrescriptionItems extends Table {
-  IntColumn get itemId => integer().autoIncrement()();
-  IntColumn get prescriptionId => integer()();
-  IntColumn get medicationId => integer()();
-  TextColumn get dosage => text().nullable().withLength(min: 1, max: 50)();
-  TextColumn get frequency => text().nullable().withLength(min: 1, max: 50)();
-  IntColumn get quantity => integer().withDefault(const Constant(1))();
+  IntColumn get itemId          => integer().autoIncrement()();
+  IntColumn get prescriptionId  => integer()();
+  IntColumn get medicationId    => integer()();
+  TextColumn get dosage         => text().nullable().withLength(min: 1, max: 50)();
+  TextColumn get frequency      => text().nullable().withLength(min: 1, max: 50)();
+  IntColumn get quantity        => integer().withDefault(const Constant(1))();
   @override
   List<String> get customConstraints => [
     'FOREIGN KEY(prescription_id) REFERENCES prescriptions(prescriptionId)',
-    'FOREIGN KEY(medication_id) REFERENCES medications(medicationId)'
+    'FOREIGN KEY(medication_id)   REFERENCES medications(medicationId)'
   ];
 }
 
 // FEEDBACKS: User feedback or support tickets.
 class Feedbacks extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  IntColumn get userId => integer()();
-  TextColumn get message => text()();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  IntColumn get id              => integer().autoIncrement()();
+  IntColumn get userId          => integer()();
+  TextColumn get message        => text()();
+  DateTimeColumn get createdAt  => dateTime().withDefault(currentDateAndTime)();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(user_id) REFERENCES users(id)'
+    'FOREIGN KEY(user_id)        REFERENCES users(id)'
   ];
 }
 
 // AUDIT_LOGS: Records actions for compliance and auditing.
 class AuditLogs extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  IntColumn get userId => integer()();
-  TextColumn get action => text()();
-  TextColumn get details => text().nullable()();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  IntColumn get id              => integer().autoIncrement()();
+  IntColumn get userId          => integer()();
+  TextColumn get action         => text()();
+  TextColumn get details        => text().nullable()();
+  DateTimeColumn get createdAt  => dateTime().withDefault(currentDateAndTime)();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(user_id) REFERENCES users(id)'
+    'FOREIGN KEY(user_id)        REFERENCES users(id)'
   ];
 }
 
 // EMERGENCY_ACCESS_REQUESTS: For emergency access approvals.
 class EmergencyAccessRequests extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  IntColumn get patientId => integer()();
-  IntColumn get physicianId => integer()();
-  TextColumn get reason => text()();
-  TextColumn get status => text().withDefault(const Constant('pending'))();
-  // four status
-  // pending => sent from the physician and pending with the patient or rejected from the pharmacy
-  // waiting => Sent to the pharmacy and waiting for approval or decline
-  // accepted => Accepted by a phramacist and waiting for dispense
-  // dispensed => the patient picked up the prescription
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  IntColumn get id              => integer().autoIncrement()();
+  IntColumn get patientId       => integer()();
+  IntColumn get physicianId     => integer()();
+  TextColumn get reason         => text()();
+  TextColumn get status         => text().withDefault(const Constant('pending'))();
+  DateTimeColumn get createdAt  => dateTime().withDefault(currentDateAndTime)();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(patient_id) REFERENCES users(id)',
-    'FOREIGN KEY(physician_id) REFERENCES users(id)'
+    'FOREIGN KEY(patient_id)     REFERENCES users(id)',
+    'FOREIGN KEY(physician_id)   REFERENCES users(id)'
   ];
 }
 
 // INSURANCES: List of insurance companies.
 class Insurances extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text().withLength(min: 1, max: 100)();
-  TextColumn get details => text()();
-
+  IntColumn get id              => integer().autoIncrement()();
+  TextColumn get name           => text().withLength(min: 1, max: 100)();
+  TextColumn get details        => text()();
 }
 
 // PHARMACY_INSURANCES: Linking pharmacies with approved insurance providers.
 class PharmacyInsurances extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  IntColumn get pharmacyId => integer()();
-  IntColumn get insuranceId => integer()();
+  IntColumn get id              => integer().autoIncrement()();
+  IntColumn get pharmacyId      => integer()();
+  IntColumn get insuranceId     => integer()();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(pharmacy_id) REFERENCES pharmacies(pharmacyId)',
-    'FOREIGN KEY(insurance_id) REFERENCES insurances(id)'
+    'FOREIGN KEY(pharmacy_id)    REFERENCES pharmacies(pharmacyId)',
+    'FOREIGN KEY(insurance_id)   REFERENCES insurances(id)'
   ];
 }
 
 // BLOCKCHAIN_TRANSACTIONS: Records blockchain data for controlled prescriptions.
 class BlockchainTransactions extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  IntColumn get prescriptionId => integer()();
-  TextColumn get transactionHash => text()();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  IntColumn get id              => integer().autoIncrement()();
+  IntColumn get prescriptionId  => integer()();
+  TextColumn get transactionHash=> text()();
+  DateTimeColumn get createdAt  => dateTime().withDefault(currentDateAndTime)();
   @override
   List<String> get customConstraints => [
     'FOREIGN KEY(prescription_id) REFERENCES prescriptions(prescriptionId)'
@@ -172,14 +178,12 @@ class BlockchainTransactions extends Table {
   EmergencyAccessRequests,
   Insurances,
   PharmacyInsurances,
-  BlockchainTransactions
+  BlockchainTransactions,
+  Pharmacist,
 ])
 class AppDatabase extends _$AppDatabase {
-
-
   // Create a private static instance
   static final AppDatabase _instance = AppDatabase._internal();
-
 
   AppDatabase._internal([QueryExecutor? e])
       : super(
@@ -207,7 +211,6 @@ class AppDatabase extends _$AppDatabase {
   // Factory constructor that returns the same instance each time.
   factory AppDatabase() => _instance;
 
-
   @override
   int get schemaVersion => 1;
 
@@ -217,10 +220,10 @@ class AppDatabase extends _$AppDatabase {
     return await into(users).insert(user);
   }
 
-
-
   Future<bool> ValidatePassword(String NatId, String HashedPassword) async {
-    final user = await (select(users)..where((u) => u.nationalId.equals(NatId))).getSingleOrNull();
+    final user = await (select(users)
+      ..where((u) => u.nationalId.equals(NatId)))
+        .getSingleOrNull();
     return user?.passwordHash == HashedPassword;
   }
 
@@ -229,11 +232,15 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<List<User>> getAllPatients() async {
-    return await (select(users)..where((u) => u.role.equals("patient"))).get();
+    return await (select(users)
+      ..where((u) => u.role.equals("patient")))
+        .get();
   }
 
   Future<User?> getUserByNatID(String NatID) async {
-    return await (select(users)..where((u) => u.nationalId.equals(NatID))).getSingleOrNull();
+    return await (select(users)
+      ..where((u) => u.nationalId.equals(NatID)))
+        .getSingleOrNull();
   }
 
   Future<bool> updateUser(User user) async {
@@ -241,16 +248,29 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<int> deleteUser(int id) async {
-    return await (delete(users)..where((u) => u.id.equals(id))).go();
+    return await (delete(users)
+      ..where((u) => u.id.equals(id)))
+        .go();
   }
 
-  Future<void> updateProfile(String nationalId, String newFirstName, String newLastName, String newEmail, String newPhoneNumber) async{
+  Future<void> updateProfile(
+      String nationalId,
+      String newFirstName,
+      String newLastName,
+      String newEmail,
+      String newPhoneNumber,
+      ) async {
     final user = await (select(users)
-      ..where((u) => u.nationalId.equals(nationalId))
-    ).getSingleOrNull();
+      ..where((u) => u.nationalId.equals(nationalId)))
+        .getSingleOrNull();
 
     if (user != null) {
-      final updatedUser = user.copyWith(firstName: newFirstName, lastName: newLastName, email: newEmail, phone: Value(newPhoneNumber));
+      final updatedUser = user.copyWith(
+        firstName: newFirstName,
+        lastName: newLastName,
+        email: newEmail,
+        phone: newPhoneNumber, // removed Value<> wrapper
+      );
 
       await updateUser(updatedUser);
     }
@@ -270,65 +290,69 @@ class AppDatabase extends _$AppDatabase {
 
   // ------------------- Prescriptions CRUD OPS -----------------------------
 
-  Future<List<Prescription>> GetAllPrescriptions() async
-  {
+  Future<List<Prescription>> GetAllPrescriptions() async {
     return await select(prescriptions).get();
   }
 
-  Future<SimpleSelectStatement<$PrescriptionsTable, Prescription>> GetUserPrescriptions(String NationalId) async
-  {
-    final LoggedUser = await (select(users)..where((u) => u.nationalId.equals(NationalId))).getSingle();
-    final query = await select(prescriptions)..where((p) => p.patientId.equals(LoggedUser.id));
+  Future<SimpleSelectStatement<$PrescriptionsTable, Prescription>>
+  GetUserPrescriptions(String NationalId) async {
+    final LoggedUser = await (select(users)
+      ..where((u) => u.nationalId.equals(NationalId)))
+        .getSingle();
+    final query = select(prescriptions)
+      ..where((p) => p.patientId.equals(LoggedUser.id));
     return query;
   }
 
-  Future<bool> CreateNewPrescription(Prescription Prescription, String PatientNationalId) async {
-    var user = await getUserByNatID(PatientNationalId);
+  Future<bool> CreateNewPrescription(
+      Prescription Prescription, String PatientNationalId) async {
+    final user = await getUserByNatID(PatientNationalId);
 
-    if(user == Null) return false;
+    if (user == null) return false; // fixed null check
 
     final updatedPrescription = Prescription.copyWith(
-      patientId: user?.id,
+      patientId: user.id,
     );
-    await into(prescriptions).insert(Prescription);
+    await into(prescriptions).insert(updatedPrescription); // insert updatedPrescription
     return true;
   }
 
-  Future<Prescription> GetPrescription(int ID) async{
-    return await (select(prescriptions)..where((p) => p.prescriptionId.equals(ID))).getSingle();
+  Future<Prescription> GetPrescription(int ID) async {
+    return await (select(prescriptions)
+      ..where((p) => p.prescriptionId.equals(ID)))
+        .getSingle();
   }
 
-  Future<List<PrescriptionItem>> GetPrescriptionItems(int ID) async{
-    return await (select(prescriptionItems)..where((item) => item.prescriptionId.equals(ID))).get();
+  Future<List<PrescriptionItem>> GetPrescriptionItems(int ID) async {
+    return await (select(prescriptionItems)
+      ..where((item) => item.prescriptionId.equals(ID)))
+        .get();
   }
 
-  Future<Medication> GetMedicationInfo(int ID) async{
-    return await (select(medications)..where((med) => med.medicationId.equals(ID))).getSingle();
+  Future<Medication> GetMedicationInfo(int ID) async {
+    return await (select(medications)
+      ..where((med) => med.medicationId.equals(ID)))
+        .getSingle();
   }
 
-
-
-  //    var Items = await select(prescriptionItems)..where((item) => item.prescriptionId.equals(ID));
   // ------------------- end of Prescriptions CRUD OPS -----------------------------
 
   // ------------------- Medicine CRUD OPS -----------------------------
 
   Future<List<Medication>> searchMedications(String query) async {
-    // Create a pattern that matches any occurrence of the query
     final pattern = '%$query%';
-
-    // Build and execute the query using Drift's query builder.
     return await (select(medications)
-      ..where((m) => m.name.like(pattern) | (m.description.like(pattern)))
-    ).get();
+      ..where((m) =>
+      m.name.like(pattern) | m.description.like(pattern)))
+        .get();
   }
 
   // ------------------- end of Medicine CRUD OPS -----------------------------
+
   AppDatabase.forTesting(DatabaseConnection super.connection);
 
   Future<void> clearDatabase() async {
     await transaction(() async {
-      // List all your tables here:
       await delete(users).go();
       await delete(pharmacies).go();
       await delete(medications).go();
@@ -341,9 +365,9 @@ class AppDatabase extends _$AppDatabase {
       await delete(insurances).go();
       await delete(pharmacyInsurances).go();
       await delete(blockchainTransactions).go();
+      await delete(pharmacist).go();
     });
   }
-
 
   // -------------------------
   // Data Population Method
@@ -379,14 +403,13 @@ class AppDatabase extends _$AppDatabase {
       'Clark', 'Lewis', 'Walker', 'Hall', 'Allen',
       'Young', 'King', 'Wright', 'Scott', 'Green'
     ];
-    
 
     await into(users).insert(
       UsersCompanion.insert(
         firstName: "Test",
         lastName: "Test",
         email: 'test@example.com',
-        phone: Value('555-01${rand.nextInt(90).toString().padLeft(2, '0')}'),
+        phone: '555-01${rand.nextInt(90).toString().padLeft(2, '0')}',  // removed Value(...)
         nationalId: '9999999999',
         syndicateNumber: const Value(null),
         passwordHash: 'test',
@@ -394,31 +417,14 @@ class AppDatabase extends _$AppDatabase {
       ),
     );
     // --- Insert 200 Patients ---
-    // for (int i = 0; i < 200; i++) {
-    //   final String firstName =
-    //   patientFirstNames[rand.nextInt(patientFirstNames.length)];
-    //   final String lastName =
-    //   patientLastNames[rand.nextInt(patientLastNames.length)];
-    //   await into(users).insert(
-    //     UsersCompanion.insert(
-    //       firstName: firstName,
-    //       lastName: lastName,
-    //       email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@example.com',
-    //       phone: Value('555-01${rand.nextInt(90).toString().padLeft(2, '0')}'),
-    //       nationalId: '${1000000000 + rand.nextInt(900000000)}',
-    //       syndicateNumber: const Value(null),
-    //       passwordHash: 'hashed_password',
-    //       role: 'patient',
-    //     ),
-    //   );
-    // }
+    // for (int i = 0; i < 200; i++) { ... }
 
     await into(users).insert(
       UsersCompanion.insert(
         firstName: "Physician",
         lastName: "Test",
         email: 'test@hospital.com',
-        phone: Value('555-10${rand.nextInt(90).toString().padLeft(2, '0')}'),
+        phone: '555-10${rand.nextInt(90).toString().padLeft(2, '0')}', // removed Value(...)
         nationalId: '8888888888',
         syndicateNumber: Value('DOC-${2000}'),
         passwordHash: 'test',
@@ -426,66 +432,26 @@ class AppDatabase extends _$AppDatabase {
       ),
     );
     // --- Insert 100 Physicians ---
-    // for (int i = 0; i < 100; i++) {
-    //   final String firstName =
-    //   doctorFirstNames[rand.nextInt(doctorFirstNames.length)];
-    //   final String lastName =
-    //   doctorLastNames[rand.nextInt(doctorLastNames.length)];
-    //   await into(users).insert(
-    //     UsersCompanion.insert(
-    //       firstName: firstName,
-    //       lastName: lastName,
-    //       email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@hospital.com',
-    //       phone: Value('555-10${rand.nextInt(90).toString().padLeft(2, '0')}'),
-    //       nationalId: '${100000000 + rand.nextInt(900000000)}',
-    //       syndicateNumber: Value('DOC-${1000 + i}'),
-    //       passwordHash: 'hashed_password',
-    //       role: 'physician',
-    //     ),
-    //   );
-    // }
 
     await into(users).insert(
       UsersCompanion.insert(
         firstName: "Pharmacist",
         lastName: "Test",
         email: 'test@pharmacy.com',
-        phone: Value('555-20${rand.nextInt(90).toString().padLeft(2, '0')}'),
+        phone: '555-20${rand.nextInt(90).toString().padLeft(2, '0')}', // removed Value(...)
         nationalId: '7777777777',
         syndicateNumber: Value('PHARM-${2000}'),
         passwordHash: 'test',
         role: 'pharmacist',
       ),
     );
-
-
-    // --- Insert 100 Pharmacists ---
-    // for (int i = 0; i < 100; i++) {
-    //   final String firstName =
-    //   pharmacistFirstNames[rand.nextInt(pharmacistFirstNames.length)];
-    //   final String lastName =
-    //   pharmacistLastNames[rand.nextInt(pharmacistLastNames.length)];
-    //   await into(users).insert(
-    //     UsersCompanion.insert(
-    //       firstName: firstName,
-    //       lastName: lastName,
-    //       email: '${firstName.toLowerCase()}.${lastName.toLowerCase()}$i@pharmacy.com',
-    //       phone: Value('555-20${rand.nextInt(90).toString().padLeft(2, '0')}'),
-    //       nationalId: '${100000000 + rand.nextInt(900000000)}',
-    //       syndicateNumber: Value('PHARM-${1000 + i}'),
-    //       passwordHash: 'hashed_password',
-    //       role: 'pharmacist',
-    //     ),
-    //   );
-    // }
-
     // --- Insert 1 Admin ---
     await into(users).insert(
       UsersCompanion.insert(
         firstName: 'Admin',
         lastName: 'User',
         email: 'admin@example.com',
-        phone: Value('555-999000'),
+        phone: '555-999000', // removed Value(...)
         nationalId: 'NID-ADMIN-1',
         syndicateNumber: const Value(null),
         passwordHash: 'hashed_admin',
@@ -525,15 +491,15 @@ class AppDatabase extends _$AppDatabase {
     // --- Insert 10 Medications (Real Medications) ---
     final List<Map<String, dynamic>> meds = [
       {'name': 'Amoxicillin', 'description': 'Antibiotic for bacterial infections', 'controlled': false},
-      {'name': 'Ibuprofen', 'description': 'Nonsteroidal anti-inflammatory drug', 'controlled': false},
-      {'name': 'Clindamycin', 'description': 'Antibiotic used to treat infections', 'controlled': false},
-      {'name': 'Morphine', 'description': 'Opioid for severe pain', 'controlled': true},
-      {'name': 'Tramadol', 'description': 'Opioid analgesic for moderate pain', 'controlled': true},
-      {'name': 'Metformin', 'description': 'Medication for type 2 diabetes', 'controlled': false},
-      {'name': 'Lisinopril', 'description': 'Medication for high blood pressure', 'controlled': false},
+      {'name': 'Ibuprofen',    'description': 'Nonsteroidal anti-inflammatory drug', 'controlled': false},
+      {'name': 'Clindamycin',  'description': 'Antibiotic used to treat infections', 'controlled': false},
+      {'name': 'Morphine',     'description': 'Opioid for severe pain', 'controlled': true},
+      {'name': 'Tramadol',     'description': 'Opioid analgesic for moderate pain', 'controlled': true},
+      {'name': 'Metformin',    'description': 'Medication for type 2 diabetes', 'controlled': false},
+      {'name': 'Lisinopril',   'description': 'Medication for high blood pressure', 'controlled': false},
       {'name': 'Atorvastatin', 'description': 'Cholesterol-lowering medication', 'controlled': false},
-      {'name': 'Amlodipine', 'description': 'Calcium channel blocker for high blood pressure', 'controlled': false},
-      {'name': 'Omeprazole', 'description': 'Proton pump inhibitor for acid reflux', 'controlled': false},
+      {'name': 'Amlodipine',   'description': 'Calcium channel blocker for high blood pressure', 'controlled': false},
+      {'name': 'Omeprazole',   'description': 'Proton pump inhibitor for acid reflux', 'controlled': false},
     ];
     for (var med in meds) {
       await into(medications).insert(
@@ -545,8 +511,24 @@ class AppDatabase extends _$AppDatabase {
       );
     }
 
+    // Assign Pharmacists to Pharmacies
+    final allPharmacies   = await select(pharmacies).get();
+    final allPharmacists  = await (select(users)..where((u) => u.role.equals('pharmacist'))).get();
+    for (var pharmacy in allPharmacies) {
+      final count = 1 + rand.nextInt(3);
+      for (var i = 0; i < count; i++) {
+        final pharm = allPharmacists[rand.nextInt(allPharmacists.length)];
+        await into(pharmacist).insert(
+          PharmacistCompanion.insert(
+            pharmacyId: pharmacy.pharmacyId,
+            pharmacistId: pharm.id,
+          ),
+        );
+      }
+    }
+
     // --- Insert Inventory for each Pharmacy & Medication ---
-    final List<Pharmacy> pharmacyList = await select(pharmacies).get();
+    final List<Pharmacy> pharmacyList    = await select(pharmacies).get();
     final List<Medication> medicationList = await select(medications).get();
     for (var pharmacy in pharmacyList) {
       for (var med in medicationList) {
@@ -554,23 +536,18 @@ class AppDatabase extends _$AppDatabase {
           InventoryCompanion.insert(
             pharmacyId: pharmacy.pharmacyId,
             medicationId: med.medicationId,
-            quantity: Value(50 + rand.nextInt(50)), // between 50 and 99
-            reorderThreshold: Value(10 + rand.nextInt(10)), // between 10 and 19
-            price: Value(5.0 + rand.nextDouble() * 20.0), // between 5.0 and 25.0
+            quantity: Value(50 + rand.nextInt(50)),
+            reorderThreshold: Value(10 + rand.nextInt(10)),
+            price: Value(5.0 + rand.nextDouble() * 20.0),
           ),
         );
       }
     }
 
-    // --- Insert 100 Prescriptions with 1-3 Prescription Items ---
-    final List<User> patientList = await (select(users)
-      ..where((tbl) => tbl.role.equals('patient')))
-        .get();
-    final List<User> physicianList = await (select(users)
-      ..where((tbl) => tbl.role.equals('physician')))
-        .get();
+    final List<User> patientList   = await (select(users)..where((u) => u.role.equals('patient'))).get();
+    final List<User> physicianList = await (select(users)..where((u) => u.role.equals('physician'))).get();
     for (int i = 0; i < 100; i++) {
-      final patient = patientList[rand.nextInt(patientList.length)];
+      final patient   = patientList[rand.nextInt(patientList.length)];
       final physician = physicianList[rand.nextInt(physicianList.length)];
       final int prescriptionId = await into(prescriptions).insert(
         PrescriptionsCompanion.insert(
@@ -580,7 +557,7 @@ class AppDatabase extends _$AppDatabase {
           instructions: Value('Take with meals, preferably after food.'),
         ),
       );
-      int itemsCount = 1 + rand.nextInt(3); // 1 to 3 items
+      int itemsCount = 1 + rand.nextInt(3);
       for (int j = 0; j < itemsCount; j++) {
         final med = medicationList[rand.nextInt(medicationList.length)];
         await into(prescriptionItems).insert(
@@ -589,7 +566,7 @@ class AppDatabase extends _$AppDatabase {
             medicationId: med.medicationId,
             dosage: Value('500 mg'),
             frequency: Value('3 times a day'),
-            quantity: Value(10 + rand.nextInt(10)), // 10 to 19 units
+            quantity: Value(10 + rand.nextInt(10)),
           ),
         );
       }
@@ -621,7 +598,7 @@ class AppDatabase extends _$AppDatabase {
 
     // --- Insert 20 Emergency Access Requests ---
     for (int i = 0; i < 20; i++) {
-      final randomPatient = patientList[rand.nextInt(patientList.length)];
+      final randomPatient   = patientList[rand.nextInt(patientList.length)];
       final randomPhysician = physicianList[rand.nextInt(physicianList.length)];
       await into(emergencyAccessRequests).insert(
         EmergencyAccessRequestsCompanion.insert(
@@ -635,7 +612,7 @@ class AppDatabase extends _$AppDatabase {
 
     // --- Insert 5 Insurances with Realistic Details ---
     final List<String> insuranceCodes = ['A', 'B', 'C', 'D', 'E'];
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < insuranceCodes.length; i++) {
       await into(insurances).insert(
         InsurancesCompanion.insert(
           name: 'Insurance ${insuranceCodes[i]}',
@@ -647,7 +624,7 @@ class AppDatabase extends _$AppDatabase {
     // --- Insert PharmacyInsurances: Each Pharmacy Gets 1-2 Random Insurances ---
     final List<Insurance> insuranceList = await select(insurances).get();
     for (var pharmacy in pharmacyList) {
-      int count = (1 + rand.nextInt(2));
+      final count = 1 + rand.nextInt(2);
       for (int i = 0; i < count; i++) {
         final ins = insuranceList[rand.nextInt(insuranceList.length)];
         await into(pharmacyInsurances).insert(
@@ -671,6 +648,4 @@ class AppDatabase extends _$AppDatabase {
       );
     }
   }
-
-  getAllPrescriptions() {}
 }
