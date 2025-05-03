@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/Patient/Prescriptions/SendToPharmacy.dart';
 
 import '../../data/database.dart';
 
-// Replace these imports with wherever your AppDatabase,
-// Prescription, PrescriptionItem, and Medication classes are defined.
-// import 'package:your_app/database/app_database.dart';
-
-// Helper class to combine a PrescriptionItem with its Medication info
 class PrescriptionItemWithMedication {
   final PrescriptionItem item;
   final Medication medication;
@@ -15,7 +11,7 @@ class PrescriptionItemWithMedication {
 }
 
 class SinglePrescription extends StatefulWidget {
-  final int prescriptionId; // Assuming your DB uses int IDs
+  final int prescriptionId;
 
   const SinglePrescription({
     Key? key,
@@ -39,11 +35,11 @@ class _SinglePrescriptionState extends State<SinglePrescription> {
   }
 
   Future<List<PrescriptionItemWithMedication>> _fetchItemsWithMedication(int prescriptionId) async {
-    final db = AppDatabase();
-    final items = await db.GetPrescriptionItems(prescriptionId);
+    AppDatabase db = AppDatabase();
+    var items = await db.GetPrescriptionItems(prescriptionId);
 
     // For each PrescriptionItem, also fetch the Medication info
-    final results = <PrescriptionItemWithMedication>[];
+    var results = <PrescriptionItemWithMedication>[];
     for (final item in items) {
       final medication = await db.GetMedicationInfo(item.medicationId);
       results.add(PrescriptionItemWithMedication(item, medication));
@@ -75,9 +71,6 @@ class _SinglePrescriptionState extends State<SinglePrescription> {
             return const Center(child: Text('No prescription found.'));
           }
 
-          final prescription = prescriptionSnapshot.data!;
-
-          // Now fetch the items (and their medication info)
           return FutureBuilder<List<PrescriptionItemWithMedication>>(
             future: _prescriptionItemsFuture,
             builder: (context, itemsSnapshot) {
@@ -99,7 +92,6 @@ class _SinglePrescriptionState extends State<SinglePrescription> {
                     Row(
                       children: [
                     Icon(Icons.person, size: 28, color: Colors.grey.shade700),
-                    // Doctor name (assuming you store it in 'doctorName')
                     Text(
                       'Dr. John', //${prescription.doctorName}
                       style: const TextStyle(
@@ -132,9 +124,8 @@ class _SinglePrescriptionState extends State<SinglePrescription> {
                                 Row(
                             children: [
                                 Icon(Icons.medication, color: Colors.blue, size: 28),
-                                // Medication name
                                 Text(
-                                  medication.name, // e.g. 'Amoxicillin 500mg'
+                                  medication.name,
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -145,7 +136,7 @@ class _SinglePrescriptionState extends State<SinglePrescription> {
                                 ),
                                 const SizedBox(height: 4),
 
-                                // Dosage instructions from the item
+                                // Dosage instructions
                                 Text(
                                   'Take ',// ${item.dosageInstructions}
                                   style: const TextStyle(
@@ -170,7 +161,6 @@ class _SinglePrescriptionState extends State<SinglePrescription> {
                       ),
                     ),
 
-                    // Disclaimers (hard-coded or fetched from DB)
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
@@ -194,9 +184,10 @@ class _SinglePrescriptionState extends State<SinglePrescription> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
+
                         onPressed: () {
-                          // Handle sending to pharmacy here
-                        },
+                          final AppDatabase datab = new AppDatabase();
+                          Navigator.push(context,MaterialPageRoute(builder: (context) => SendToPharmacy(datab)));},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           padding: const EdgeInsets.symmetric(vertical: 16.0),

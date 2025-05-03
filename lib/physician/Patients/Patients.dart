@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/CommonWeb/login_screen.dart';
 import 'package:prescripto/data/database.dart'; // <-- Adjust to your actual path
 import 'package:prescripto/physician/Feedback/Feedback.dart';
+import 'package:prescripto/physician/Help/Help.dart';
 import 'package:prescripto/physician/Home/Home.dart';
 import 'package:prescripto/physician/Prescriptions/NewPrescription.dart';
-import 'package:prescripto/physician/Patients/PatientsBackEnd.dart';
+
 
 class Patients extends StatefulWidget {
   @override
@@ -88,32 +90,40 @@ class _PatientsPageState extends State<Patients> {
     }
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F5F5),
       body: Row(
         children: [
-          // Sidebar Menu
+          // Sidebar
           Container(
             width: 200,
-            color: Colors.grey[200],
+            color: Colors.indigo[200],
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(
+                  height: 160,
+                  width: double.infinity,
+                  child: Image.asset(
+                    'assets/PrescriptoLogo.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 ListTile(
-                  leading: Icon(Icons.home),
-                  title: Text('Home'),
-                  onTap: () {
+                  leading: const Icon(Icons.home),
+                  title: const Text('Home'),
+                  onTap: () {       
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => physicianHome()),
-                    );
-                  },
+                    );},
                 ),
                 ListTile(
-                  leading: Icon(Icons.edit),
-                  title: Text('New Prescriptions'),
+                  leading: const Icon(Icons.edit),
+                  title: const Text('New Prescriptions'),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -122,14 +132,15 @@ class _PatientsPageState extends State<Patients> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.people),
-                  title: Text('Patients'),
-                  selected: true,
-                  onTap: () {},
+                  leading: const Icon(Icons.person),
+                  title: const Text('Patients'),
+                  onTap: () {
+                   
+                  },
                 ),
                 ListTile(
-                  leading: Icon(Icons.feedback),
-                  title: Text('Feedback'),
+                  leading: const Icon(Icons.feedback),
+                  title: const Text('Feedback'),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -138,13 +149,28 @@ class _PatientsPageState extends State<Patients> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.help),
-                  title: Text('Help'),
-                  onTap: () {},
+                  leading: const Icon(Icons.help),
+                  title: const Text('Help'),
+                  onTap: () { Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HelpPage()),
+                    );},
+                ),
+                ListTile(
+                  leading: const Icon(Icons.logout_outlined),
+                  title: const Text('Log out'),
+                  onTap: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => WebLoginPage()),
+                      (route) => false,
+                    );
+                  },
                 ),
               ],
             ),
           ),
+
           // Main Content Area
           Expanded(
             child: Padding(

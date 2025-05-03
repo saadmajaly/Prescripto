@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../AuthLogic/AuthProvider.dart';
+import '../../data/database.dart';
 import 'TrackerBackEnd.dart';
 
 class Tracker extends StatefulWidget {
@@ -21,7 +23,10 @@ class _TrackerState extends State<Tracker> {
   }
 
   Future<void> _fetchTrackerData() async {
-    const String nationalId = "9999999999"; // Replace with actual user ID
+    final AppDatabase db = AppDatabase();
+    final authProvider = AuthProvider(db);
+    final nationalId = await authProvider.getLoggedInNationalID() as String;
+
     final schedule = await backend.getTodaysSchedule(nationalId);
     final log = await backend.getMedicationLog(nationalId);
 
@@ -41,7 +46,7 @@ class _TrackerState extends State<Tracker> {
           'Medication Tracker',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.black,
         elevation: 0,
       ),

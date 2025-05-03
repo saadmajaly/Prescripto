@@ -1,4 +1,3 @@
-import 'package:drift/src/runtime/data_class.dart';
 import '../../data/database.dart';
 import '../../AuthLogic/AuthProvider.dart';
 class SettingsBackEnd {

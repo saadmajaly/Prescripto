@@ -11,14 +11,12 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers for each text field
   final TextEditingController _nationalIdController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Default country is set to 'United States'
 String? _selectedCountry = 'Jordan';
 bool _agreeToTerms = false;
 
@@ -35,7 +33,6 @@ bool _agreeToTerms = false;
 
   void _submitForm() {
     if (_formKey.currentState!.validate() && _agreeToTerms) {
-      // : handle sign-up logic (e.g. API call)
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Signing up...')),
       );
@@ -49,7 +46,6 @@ bool _agreeToTerms = false;
   @override
   Widget build(BuildContext context) {
     return Theme(
-      // Ensure all text defaults to black
       data: Theme.of(context).copyWith(
         textTheme: Theme.of(context).textTheme.apply(
               bodyColor: Colors.black,
@@ -73,7 +69,6 @@ bool _agreeToTerms = false;
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title
                 Text(
                    'Sign up',
   style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -82,7 +77,6 @@ bool _agreeToTerms = false;
                 ),
                 const SizedBox(height: 24),
 
-                // National ID
                 TextFormField(
                   controller: _nationalIdController,
                   style: const TextStyle(color: Colors.black),
@@ -99,7 +93,6 @@ bool _agreeToTerms = false;
                 ),
                 const SizedBox(height: 16),
 
-                // First name
                 TextFormField(
                   controller: _firstNameController,
                   style: const TextStyle(color: Colors.black),
@@ -116,7 +109,6 @@ bool _agreeToTerms = false;
                 ),
                 const SizedBox(height: 16),
 
-                // Last name
                 TextFormField(
                   controller: _lastNameController,
                   style: const TextStyle(color: Colors.black),
@@ -133,7 +125,6 @@ bool _agreeToTerms = false;
                 ),
                 const SizedBox(height: 16),
 
-                // Email address
                 TextFormField(
                   controller: _emailController,
                   style: const TextStyle(color: Colors.black),
@@ -151,7 +142,6 @@ bool _agreeToTerms = false;
                 ),
                 const SizedBox(height: 16),
 
-                // Password
                 TextFormField(
                   controller: _passwordController,
                   style: const TextStyle(color: Colors.black),
@@ -169,7 +159,6 @@ bool _agreeToTerms = false;
                 ),
                 const SizedBox(height: 16),
 
-                // Country dropdown (only Jordan and United States)
                 DropdownButtonFormField<String>(
                   value: _selectedCountry,
                   style: const TextStyle(color: Colors.black),
@@ -195,7 +184,6 @@ bool _agreeToTerms = false;
                 ),
                 const SizedBox(height: 16),
 
-                // Terms & Conditions
                 Row(
                   children: [
                     Checkbox(
@@ -217,7 +205,6 @@ bool _agreeToTerms = false;
                 ),
                 const SizedBox(height: 16),
 
-                // Sign Up button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -231,7 +218,6 @@ bool _agreeToTerms = false;
                 ),
                 const SizedBox(height: 8),
 
-                // Already have an account?
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
