@@ -44,7 +44,7 @@ class PatientsBackEnd {
   ///     and updates it in the DB.
   Future<bool> updateUserPhone(User user, String newPhone) async {
     final updatedUser = user.copyWith(
-      phone: Value(newPhone),
+      phone: Value(newPhone).toString(),
     );
     return db.updateUser(updatedUser);
   }
