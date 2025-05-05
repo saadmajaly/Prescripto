@@ -9,14 +9,6 @@ import 'package:prescripto/Pharmacist/FeedBack/FeedBack.dart';
 import 'package:prescripto/data/database.dart';
 import 'package:prescripto/AuthLogic/AuthProvider.dart';
 
-void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) => AuthProvider(AppDatabase()),
-      child: const PrescriptoApp(),
-    ),
-  );
-}
 
 class PrescriptoApp extends StatelessWidget {
   const PrescriptoApp({Key? key}) : super(key: key);
@@ -45,14 +37,16 @@ class PharmacistHomeScreen extends StatefulWidget {
 class _PharmacistHomeScreenState extends State<PharmacistHomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
+  static const _screens = [
     PharmacistHome(),
     InventoryScreen(),
     HelpScreen(),
     FeedBackScreen(),
   ];
 
-  void _onDestinationSelected(int index) => setState(() => _currentIndex = index);
+  void _onDestinationSelected(int index) {
+    setState(() => _currentIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,42 +54,57 @@ class _PharmacistHomeScreenState extends State<PharmacistHomeScreen> {
       body: Row(
         children: [
           NavigationRail(
+            // Wider rail
+            minWidth: 120,
             backgroundColor: Colors.indigo[200],
             selectedIndex: _currentIndex,
             onDestinationSelected: _onDestinationSelected,
             labelType: NavigationRailLabelType.all,
+            // Remove indicator background
+            indicatorColor: Colors.transparent,
+            // Icon theming
+            selectedIconTheme: IconThemeData(
+              color: Colors.indigo[800],
+              size: 36,
+            ),
+            unselectedIconTheme: IconThemeData(
+              color: Colors.grey.shade700,
+              size: 32,
+            ),
             leading: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Icon(
-                Icons.medical_services,
-                size: 40,
-                color: Colors.indigo[800],
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Image.asset(
+                'assets/PrescriptoLogo.png',
+                width: 100,
+                height: 100,
+                fit: BoxFit.contain,
               ),
             ),
             destinations: const [
               NavigationRailDestination(
-                icon: Icon(Icons.home, size: 32),
-                selectedIcon: Icon(Icons.home_filled, size: 36),
+                icon: Icon(Icons.home),
+                selectedIcon: Icon(Icons.home_filled),
                 label: Text('Home'),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.inventory, size: 32),
-                selectedIcon: Icon(Icons.inventory_2, size: 36),
+                icon: Icon(Icons.inventory),
+                selectedIcon: Icon(Icons.inventory_2),
                 label: Text('Inventory'),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.help_outline, size: 32),
-                selectedIcon: Icon(Icons.help, size: 36),
+                icon: Icon(Icons.help_outline),
+                selectedIcon: Icon(Icons.help),
                 label: Text('Help'),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.feedback, size: 32),
-                selectedIcon: Icon(Icons.feedback_outlined, size: 36),
+                icon: Icon(Icons.feedback),
+                selectedIcon: Icon(Icons.feedback_outlined),
                 label: Text('Feedback'),
               ),
             ],
           ),
           const VerticalDivider(width: 1),
+          // Display selected screen
           Expanded(child: _screens[_currentIndex]),
         ],
       ),

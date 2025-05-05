@@ -443,7 +443,6 @@ class AppDatabase extends _$AppDatabase {
         syndicateNumber: Value('PHARM-${2000}'),
         passwordHash: 'test',
         role: 'pharmacist',
-        //pharmacyid: '1',
       ),
     );
     // --- Insert 1 Admin ---
@@ -529,21 +528,23 @@ class AppDatabase extends _$AppDatabase {
     }
 
     // --- Insert Inventory for each Pharmacy & Medication ---
-    final List<Pharmacy> pharmacyList    = await select(pharmacies).get();
-    final List<Medication> medicationList = await select(medications).get();
-    for (var pharmacy in pharmacyList) {
-      for (var med in medicationList) {
-        await into(inventory).insert(
-          InventoryCompanion.insert(
-            pharmacyId: pharmacy.pharmacyId,
-            medicationId: med.medicationId,
-            quantity: Value(50 + rand.nextInt(50)),
-            reorderThreshold: Value(10 + rand.nextInt(10)),
-            price: Value(5.0 + rand.nextDouble() * 20.0),
-          ),
-        );
-      }
+    final pharmacyList    = await select(pharmacies).get();
+    final medicationList  = await select(medications).get();
+
+    for (var med in medicationList) {
+      // pick one random pharmacy per medication
+      final pharmacy = pharmacyList[rand.nextInt(pharmacyList.length)];
+      await into(inventory).insert(
+        InventoryCompanion.insert(
+          pharmacyId:      pharmacy.pharmacyId,
+          medicationId:    med.medicationId,
+          quantity:        Value(50 + rand.nextInt(50)),
+          reorderThreshold:Value(10 + rand.nextInt(10)),
+          price:           Value(5.0 + rand.nextDouble() * 20.0),
+        ),
+      );
     }
+
 
     final List<User> patientList   = await (select(users)..where((u) => u.role.equals('patient'))).get();
     final List<User> physicianList = await (select(users)..where((u) => u.role.equals('physician'))).get();

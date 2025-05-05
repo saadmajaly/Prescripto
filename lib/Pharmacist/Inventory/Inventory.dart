@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prescripto/data/database.dart';
 import 'InventoryBackEnd.dart';
 
-/// Displays only the logged-in pharmacist’s inventory.
+/// Displays all inventory items in a scrollable list.
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({Key? key}) : super(key: key);
 
@@ -43,9 +43,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
       _filtered = query.isEmpty
           ? _items
           : _items
-          .where((i) => (i['medicationName'] as String)
-          .toLowerCase()
-          .contains(query))
+          .where((item) =>
+          (item['medicationName'] as String).toLowerCase().contains(query))
           .toList();
     });
   }
@@ -75,7 +74,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           const SizedBox(height: 16),
           Expanded(
             child: _filtered.isEmpty
-                ? const Center(child: Text('No items found'))
+                ? const Center(child: Text('No inventory items found'))
                 : ListView.builder(
               itemCount: _filtered.length,
               itemBuilder: (ctx, i) {
@@ -89,7 +88,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       '\$${(item['price'] as double).toStringAsFixed(2)}',
                     ),
                     onTap: () {
-                      // TODO: edit/view item details
+                      // TODO: implement edit/view details
                     },
                   ),
                 );
