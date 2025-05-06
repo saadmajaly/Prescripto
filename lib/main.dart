@@ -16,6 +16,8 @@ import 'package:prescripto/Patient/Auth/Login.dart';
 import 'package:prescripto/AuthLogic/AuthProvider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'Pharmacist/MainScreen.dart';
+
 bool isLoggedIn = false;
 var role = "";
 void main() async {
@@ -72,7 +74,7 @@ class MyApp extends StatelessWidget {
               break;
               case "physician": return physicianHome();
               break;
-              case "pharmacist": return PharmacistHome();
+              case "pharmacist": return PharmacistHomeScreen();
               break;
               default: return kIsWeb ? WebLoginPage() : Login();
             }
