@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prescripto/Admin/AdminHome.dart';
 import 'package:prescripto/Pharmacist/Home/Home.dart';
 import 'package:prescripto/physician/Home/Home.dart';
 import 'package:provider/provider.dart';
@@ -49,7 +50,8 @@ class _WebLoginPageState extends State<WebLoginPage>
               MaterialPageRoute(builder: (context) => PharmacistHomeScreen()),
             );
           }
-        } else {
+        }
+        else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Invalid National ID or password')),
           );
@@ -88,13 +90,6 @@ class _WebLoginPageState extends State<WebLoginPage>
                 Text(
                   "Prescripto",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  children: [
-                    _buildNavItem("Features"),
-                    _buildNavItem("Pricing"),
-                    _buildNavItem("Resources"),
-                  ],
                 ),
               ],
             ),

@@ -349,6 +349,20 @@ class AppDatabase extends _$AppDatabase {
 
   // ------------------- end of Medicine CRUD OPS -----------------------------
 
+  Future<List<EmergencyAccessRequest>> getAllEmergencyAccessRequests() {
+    return select(emergencyAccessRequests).get();
+  }
+
+  Future<int> updateEmergencyAccessRequestStatus(int requestId, String newStatus) {
+    return (update(emergencyAccessRequests)
+      ..where((tbl) => tbl.id.equals(requestId)))
+        .write(
+      EmergencyAccessRequestsCompanion(
+        status: Value(newStatus),
+      ),
+    );
+  }
+
   AppDatabase.forTesting(DatabaseConnection super.connection);
 
   Future<void> clearDatabase() async {
@@ -452,9 +466,9 @@ class AppDatabase extends _$AppDatabase {
         lastName: 'User',
         email: 'admin@example.com',
         phone: '555-999000', // removed Value(...)
-        nationalId: 'NID-ADMIN-1',
+        nationalId: '1111',
         syndicateNumber: const Value(null),
-        passwordHash: 'hashed_admin',
+        passwordHash: '1111',
         role: 'admin',
       ),
     );
