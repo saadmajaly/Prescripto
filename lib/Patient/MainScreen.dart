@@ -5,6 +5,9 @@ import 'Prescriptions/Prescriptions.dart';
 import 'Settings/Settings.dart';
 import 'Tracker/Tracker.dart';
 
+void main(){
+  runApp(MainScreen());
+}
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
 
