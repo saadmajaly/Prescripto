@@ -1,9 +1,10 @@
+import 'dart:io';
 import 'dart:math';
 
-import 'package:drift_flutter/drift_flutter.dart';
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:drift/drift.dart';
-import 'package:path_provider/path_provider.dart' show getApplicationSupportDirectory;
+import 'package:drift_hrana/drift_hrana.dart';
+import 'package:flutter/foundation.dart';
+
 part 'database.g.dart';
 
 // USERS: Holds patients, physicians, pharmacists, and admin.
@@ -22,19 +23,19 @@ class Users extends Table {
 
 // PHARMACIES: Stores pharmacy details.
 class Pharmacies extends Table {
-  IntColumn get pharmacyId       => integer().autoIncrement()();
-  TextColumn get name            => text().withLength(min: 1, max: 100)();
-  TextColumn get address         => text().nullable().withLength(min: 1, max: 255)();
-  TextColumn get phone           => text().nullable().withLength(min: 1, max: 20)();
-  RealColumn get latitude        => real().nullable()();
-  RealColumn get longitude       => real().nullable()();
-  BoolColumn get acceptsInsurance=> boolean().withDefault(const Constant(false))();
+  IntColumn get pharmacyId        => integer().autoIncrement()();
+  TextColumn get name             => text().withLength(min: 1, max: 100)();
+  TextColumn get address          => text().nullable().withLength(min: 1, max: 255)();
+  TextColumn get phone            => text().nullable().withLength(min: 1, max: 20)();
+  RealColumn get latitude         => real().nullable()();
+  RealColumn get longitude        => real().nullable()();
+  BoolColumn get acceptsInsurance => boolean().withDefault(const Constant(false))();
 }
 
 class Pharmacist extends Table {
-  IntColumn get id              => integer().autoIncrement()();
-  IntColumn get pharmacyId      => integer()();
-  IntColumn get pharmacistId    => integer()();
+  IntColumn get id               => integer().autoIncrement()();
+  IntColumn get pharmacyId       => integer()();
+  IntColumn get pharmacistId     => integer()();
 
   @override
   List<String> get customConstraints => [
@@ -53,12 +54,12 @@ class Medications extends Table {
 
 // INVENTORY: Tracks stock of medications at each pharmacy.
 class Inventory extends Table {
-  IntColumn get inventoryId     => integer().autoIncrement()();
-  IntColumn get pharmacyId      => integer()();
-  IntColumn get medicationId    => integer()();
-  IntColumn get quantity        => integer().withDefault(const Constant(0))();
-  IntColumn get reorderThreshold=> integer().withDefault(const Constant(0))();
-  RealColumn get price          => real().withDefault(const Constant(0.0))();
+  IntColumn get inventoryId      => integer().autoIncrement()();
+  IntColumn get pharmacyId       => integer()();
+  IntColumn get medicationId     => integer()();
+  IntColumn get quantity         => integer().withDefault(const Constant(0))();
+  IntColumn get reorderThreshold => integer().withDefault(const Constant(0))();
+  RealColumn get price           => real().withDefault(const Constant(0.0))();
   @override
   List<String> get customConstraints => [
     'FOREIGN KEY(pharmacy_id)    REFERENCES pharmacies(pharmacy_id)',
@@ -73,6 +74,11 @@ class Prescriptions extends Table {
   IntColumn get physicianId     => integer()();
   DateTimeColumn get createdAt  => dateTime().withDefault(currentDateAndTime)();
   TextColumn get status         => text().withDefault(const Constant('pending'))();
+  // four status
+  // pending => sent from the physician and pending with the patient or rejected from the pharmacy
+  // waiting => Sent to the pharmacy and waiting for approval or decline
+  // accepted => Accepted by a phramacist and waiting for dispense
+  // dispensed => the patient picked up the prescription
   TextColumn get instructions   => text().nullable()();
   @override
   List<String> get customConstraints => [
@@ -90,8 +96,8 @@ class PrescriptionItems extends Table {
   IntColumn get quantity        => integer().withDefault(const Constant(1))();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(prescription_id) REFERENCES prescriptions(prescriptionId)',
-    'FOREIGN KEY(medication_id)   REFERENCES medications(medicationId)'
+    'FOREIGN KEY(prescription_id) REFERENCES prescriptions(prescription_id)',
+    'FOREIGN KEY(medication_id)   REFERENCES medications(medication_id)'
   ];
 }
 
@@ -149,7 +155,7 @@ class PharmacyInsurances extends Table {
   IntColumn get insuranceId     => integer()();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(pharmacy_id)    REFERENCES pharmacies(pharmacyId)',
+    'FOREIGN KEY(pharmacy_id)    REFERENCES pharmacies(pharmacy_id)',
     'FOREIGN KEY(insurance_id)   REFERENCES insurances(id)'
   ];
 }
@@ -162,7 +168,7 @@ class BlockchainTransactions extends Table {
   DateTimeColumn get createdAt  => dateTime().withDefault(currentDateAndTime)();
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(prescription_id) REFERENCES prescriptions(prescriptionId)'
+    'FOREIGN KEY(prescription_id) REFERENCES prescriptions(prescription_id)'
   ];
 }
 
@@ -185,34 +191,16 @@ class AppDatabase extends _$AppDatabase {
   // Create a private static instance
   static final AppDatabase _instance = AppDatabase._internal();
 
-  AppDatabase._internal([QueryExecutor? e])
+  AppDatabase._internal()
       : super(
-    e ??
-        driftDatabase(
-          name: 'Prescripto',
-          native: const DriftNativeOptions(
-            databaseDirectory: getApplicationSupportDirectory,
-          ),
-          web: DriftWebOptions(
-            sqlite3Wasm: Uri.parse('sqlite3.wasm'),
-            driftWorker: Uri.parse('drift_worker.js'),
-            onResult: (result) {
-              if (result.missingFeatures.isNotEmpty) {
-                debugPrint(
-                  'Using ${result.chosenImplementation} due to unsupported '
-                      'browser features: ${result.missingFeatures}',
-                );
-              }
-            },
-          ),
-        ),
+
+    HranaDatabase(Uri.parse('ws://${kIsWeb || !Platform.isAndroid ? 'localhost' : '10.0.2.2'}:8080/',)),
   );
 
-  // Factory constructor that returns the same instance each time.
   factory AppDatabase() => _instance;
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   // ------------------- Users CRUD OPS -----------------------------
 
@@ -220,7 +208,7 @@ class AppDatabase extends _$AppDatabase {
     return await into(users).insert(user);
   }
 
-  Future<bool> ValidatePassword(String NatId, String HashedPassword) async {
+  Future<bool> validatePassword(String NatId, String HashedPassword) async {
     final user = await (select(users)
       ..where((u) => u.nationalId.equals(NatId)))
         .getSingleOrNull();
@@ -269,15 +257,15 @@ class AppDatabase extends _$AppDatabase {
         firstName: newFirstName,
         lastName: newLastName,
         email: newEmail,
-        phone: newPhoneNumber, // removed Value<> wrapper
+        phone: newPhoneNumber,
       );
 
-      await updateUser(updatedUser);
+      await update(users).replace(updatedUser);
     }
   }
 
   Future<List<User>> searchUsers(String query, {String? role}) async {
-    final pattern = '%$query%';
+    final pattern = '%\$query%';
     final selectQuery = select(users)
       ..where((u) => (u.firstName.like(pattern) | u.lastName.like(pattern)));
     if (role != null) {
@@ -286,68 +274,61 @@ class AppDatabase extends _$AppDatabase {
     return selectQuery.get();
   }
 
-  // ------------------- end of Users CRUD OPS -----------------------------
+  // ------------------- Prescriptions CRUD OPS ----------------------
 
-  // ------------------- Prescriptions CRUD OPS -----------------------------
-
-  Future<List<Prescription>> GetAllPrescriptions() async {
+  Future<List<Prescription>> getAllPrescriptions() async {
     return await select(prescriptions).get();
   }
 
-  Future<SimpleSelectStatement<$PrescriptionsTable, Prescription>>
-  GetUserPrescriptions(String NationalId) async {
+  Future<List<Prescription>> getUserPrescriptions(String NationalId) async {
     final LoggedUser = await (select(users)
       ..where((u) => u.nationalId.equals(NationalId)))
         .getSingle();
     final query = select(prescriptions)
       ..where((p) => p.patientId.equals(LoggedUser.id));
-    return query;
+    return query.get();
   }
 
-  Future<bool> CreateNewPrescription(
+  Future<bool> createNewPrescription(
       Prescription Prescription, String PatientNationalId) async {
     final user = await getUserByNatID(PatientNationalId);
 
-    if (user == null) return false; // fixed null check
+    if (user == null) return false;
 
     final updatedPrescription = Prescription.copyWith(
       patientId: user.id,
     );
-    await into(prescriptions).insert(updatedPrescription); // insert updatedPrescription
+    await into(prescriptions).insert(updatedPrescription);
     return true;
   }
 
-  Future<Prescription> GetPrescription(int ID) async {
+  Future<Prescription> getPrescription(int ID) async {
     return await (select(prescriptions)
       ..where((p) => p.prescriptionId.equals(ID)))
         .getSingle();
   }
 
-  Future<List<PrescriptionItem>> GetPrescriptionItems(int ID) async {
+  Future<List<PrescriptionItem>> getPrescriptionItems(int ID) async {
     return await (select(prescriptionItems)
       ..where((item) => item.prescriptionId.equals(ID)))
         .get();
   }
 
-  Future<Medication> GetMedicationInfo(int ID) async {
+  Future<Medication> getMedicationInfo(int ID) async {
     return await (select(medications)
       ..where((med) => med.medicationId.equals(ID)))
         .getSingle();
   }
 
-  // ------------------- end of Prescriptions CRUD OPS -----------------------------
-
-  // ------------------- Medicine CRUD OPS -----------------------------
+  // ------------------- Medicine CRUD OPS ---------------------------
 
   Future<List<Medication>> searchMedications(String query) async {
-    final pattern = '%$query%';
+    final pattern = '%\$query%';
     return await (select(medications)
       ..where((m) =>
       m.name.like(pattern) | m.description.like(pattern)))
         .get();
   }
-
-  // ------------------- end of Medicine CRUD OPS -----------------------------
 
   Future<List<EmergencyAccessRequest>> getAllEmergencyAccessRequests() {
     return select(emergencyAccessRequests).get();
@@ -367,19 +348,19 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> clearDatabase() async {
     await transaction(() async {
-      await delete(users).go();
-      await delete(pharmacies).go();
-      await delete(medications).go();
+      await delete(pharmacyInsurances).go();
+      await delete(pharmacist).go();
       await delete(inventory).go();
-      await delete(prescriptions).go();
       await delete(prescriptionItems).go();
+      await delete(blockchainTransactions).go();
+      await delete(prescriptions).go();
       await delete(feedbacks).go();
       await delete(auditLogs).go();
       await delete(emergencyAccessRequests).go();
       await delete(insurances).go();
-      await delete(pharmacyInsurances).go();
-      await delete(blockchainTransactions).go();
-      await delete(pharmacist).go();
+      await delete(medications).go();
+      await delete(pharmacies).go();
+      await delete(users).go();
     });
   }
 
@@ -423,7 +404,7 @@ class AppDatabase extends _$AppDatabase {
         firstName: "Test",
         lastName: "Test",
         email: 'test@example.com',
-        phone: '555-01${rand.nextInt(90).toString().padLeft(2, '0')}',  // removed Value(...)
+        phone: '555-01${rand.nextInt(90).toString().padLeft(2, "0")}',
         nationalId: '9999999999',
         syndicateNumber: const Value(null),
         passwordHash: 'test',
@@ -431,33 +412,59 @@ class AppDatabase extends _$AppDatabase {
       ),
     );
     // --- Insert 200 Patients ---
-    // for (int i = 0; i < 200; i++) { ... }
+    // for (int i = 0; i < 200; i++) {
+    //   await into(users).insert(
+    //     UsersCompanion.insert(
+    //       firstName: patientFirstNames[rand.nextInt(patientFirstNames.length)],
+    //       lastName: patientLastNames[rand.nextInt(patientLastNames.length)],
+    //       email: 'patient$i@example.com',
+    //       phone: '555-00${rand.nextInt(90).toString().padLeft(2, "0")}',
+    //       nationalId: 'P$i${rand.nextInt(100000)}',
+    //       syndicateNumber: const Value(null),
+    //       passwordHash: 'password',
+    //       role: 'patient',
+    //     ),
+    //   );
+    // }
 
     await into(users).insert(
       UsersCompanion.insert(
         firstName: "Physician",
         lastName: "Test",
         email: 'test@hospital.com',
-        phone: '555-10${rand.nextInt(90).toString().padLeft(2, '0')}', // removed Value(...)
+        phone: '555-10${rand.nextInt(90).toString().padLeft(2, "0")}',
         nationalId: '8888888888',
-        syndicateNumber: Value('DOC-${2000}'),
+        syndicateNumber: Value('DOC-2000'),
         passwordHash: 'test',
         role: 'physician',
       ),
     );
     // --- Insert 100 Physicians ---
+    // for (int i = 0; i < 100; i++) {
+    //   await into(users).insert(
+    //     UsersCompanion.insert(
+    //       firstName: doctorFirstNames[rand.nextInt(doctorFirstNames.length)],
+    //       lastName: doctorLastNames[rand.nextInt(doctorLastNames.length)],
+    //       email: 'physician$i@hospital.com',
+    //       phone: '555-20${rand.nextInt(90).toString().padLeft(2, "0")}',
+    //       nationalId: 'D$i${rand.nextInt(100000)}',
+    //       syndicateNumber: Value('DOC-${1000 + i}'),
+    //       passwordHash: 'password',
+    //       role: 'physician',
+    //     ),
+    //   );
+    // }
 
     await into(users).insert(
       UsersCompanion.insert(
         firstName: "Pharmacist",
         lastName: "Test",
         email: 'test@pharmacy.com',
-        phone: '555-20${rand.nextInt(90).toString().padLeft(2, '0')}', // removed Value(...)
+        phone: '555-20${rand.nextInt(90).toString().padLeft(2, "0")}',
         nationalId: '7777777777',
-        syndicateNumber: Value('PHARM-${2000}'),
+        syndicateNumber: Value('PHARM-2000'),
         passwordHash: 'test',
         role: 'pharmacist',
-        //pharmacyid: '1',
       ),
     );
     // --- Insert 1 Admin ---
@@ -466,7 +473,7 @@ class AppDatabase extends _$AppDatabase {
         firstName: 'Admin',
         lastName: 'User',
         email: 'admin@example.com',
-        phone: '555-999000', // removed Value(...)
+        phone: '555-999000',
         nationalId: '1111',
         syndicateNumber: const Value(null),
         passwordHash: '1111',
@@ -487,15 +494,13 @@ class AppDatabase extends _$AppDatabase {
     ];
 
     for (int i = 0; i < 50; i++) {
-      final String name =
-          '${pharmacyNames[rand.nextInt(pharmacyNames.length)]} ${i + 1}';
-      final String address =
-          '${pharmacyAddresses[rand.nextInt(pharmacyAddresses.length)]}, City, Country';
+      final name = '${pharmacyNames[rand.nextInt(pharmacyNames.length)]} $i';
+      final address = '${pharmacyAddresses[rand.nextInt(pharmacyAddresses.length)]}, City, Country';
       await into(pharmacies).insert(
         PharmaciesCompanion.insert(
           name: name,
           address: Value(address),
-          phone: Value('555-300${rand.nextInt(900).toString().padLeft(3, '0')}'),
+          phone: Value('555-300${rand.nextInt(900).toString().padLeft(3, "0")}'),
           latitude: Value(31.95 + rand.nextDouble() * 0.1),
           longitude: Value(35.90 + rand.nextDouble() * 0.1),
           acceptsInsurance: Value(i % 2 == 0),
@@ -503,7 +508,7 @@ class AppDatabase extends _$AppDatabase {
       );
     }
 
-    // --- Insert 10 Medications (Real Medications) ---
+    // --- Insert 10 Medications ---
     final List<Map<String, dynamic>> meds = [
       {'name': 'Amoxicillin', 'description': 'Antibiotic for bacterial infections', 'controlled': false},
       {'name': 'Ibuprofen',    'description': 'Nonsteroidal anti-inflammatory drug', 'controlled': false},
@@ -543,22 +548,23 @@ class AppDatabase extends _$AppDatabase {
     }
 
     // --- Insert Inventory for each Pharmacy & Medication ---
-    final List<Pharmacy> pharmacyList    = await select(pharmacies).get();
-    final List<Medication> medicationList = await select(medications).get();
-    for (var pharmacy in pharmacyList) {
-      for (var med in medicationList) {
-        await into(inventory).insert(
-          InventoryCompanion.insert(
-            pharmacyId: pharmacy.pharmacyId,
-            medicationId: med.medicationId,
-            quantity: Value(50 + rand.nextInt(50)),
-            reorderThreshold: Value(10 + rand.nextInt(10)),
-            price: Value(5.0 + rand.nextDouble() * 20.0),
-          ),
-        );
-      }
+    final pharmacyList    = await select(pharmacies).get();
+    final medicationList  = await select(medications).get();
+
+    for (var med in medicationList) {
+      final pharmacy = pharmacyList[rand.nextInt(pharmacyList.length)];
+      await into(inventory).insert(
+        InventoryCompanion.insert(
+          pharmacyId:      pharmacy.pharmacyId,
+          medicationId:    med.medicationId,
+          quantity:        Value(50 + rand.nextInt(50)),
+          reorderThreshold:Value(10 + rand.nextInt(10)),
+          price:           Value(5.0 + rand.nextDouble() * 20.0),
+        ),
+      );
     }
 
+    // --- Insert Prescriptions & Items ---
     final List<User> patientList   = await (select(users)..where((u) => u.role.equals('patient'))).get();
     final List<User> physicianList = await (select(users)..where((u) => u.role.equals('physician'))).get();
     for (int i = 0; i < 100; i++) {
@@ -587,31 +593,31 @@ class AppDatabase extends _$AppDatabase {
       }
     }
 
-    // --- Insert 50 Feedback Entries with Realistic Messages ---
+    // --- Insert Feedback Entries ---
     final List<User> allUsers = await select(users).get();
     for (int i = 0; i < 50; i++) {
       final randomUser = allUsers[rand.nextInt(allUsers.length)];
       await into(feedbacks).insert(
         FeedbacksCompanion.insert(
           userId: randomUser.id,
-          message: 'I, ${randomUser.firstName} ${randomUser.lastName}, am very satisfied with the service.',
+          message: 'I, \${randomUser.firstName} \${randomUser.lastName}, am very satisfied with the service.',
         ),
       );
     }
 
-    // --- Insert 100 Audit Logs with Realistic Details ---
+    // --- Insert Audit Logs ---
     for (int i = 0; i < 100; i++) {
       final randomUser = allUsers[rand.nextInt(allUsers.length)];
       await into(auditLogs).insert(
         AuditLogsCompanion.insert(
           userId: randomUser.id,
-          action: 'ACTION_$i',
-          details: Value('User ${randomUser.firstName} ${randomUser.lastName} performed action $i.'),
+          action: 'ACTION_\$i',
+          details: Value('User \${randomUser.firstName} \${randomUser.lastName} performed action \$i.'),
         ),
       );
     }
 
-    // --- Insert 20 Emergency Access Requests ---
+    // --- Insert Emergency Access Requests ---
     for (int i = 0; i < 20; i++) {
       final randomPatient   = patientList[rand.nextInt(patientList.length)];
       final randomPhysician = physicianList[rand.nextInt(physicianList.length)];
@@ -619,24 +625,24 @@ class AppDatabase extends _$AppDatabase {
         EmergencyAccessRequestsCompanion.insert(
           patientId: randomPatient.id,
           physicianId: randomPhysician.id,
-          reason: 'Emergency: Immediate access needed for ${randomPatient.firstName} ${randomPatient.lastName}.',
-          status: Value('pending'),
+          reason: 'Emergency: Immediate access needed for \${randomPatient.firstName} \${randomPatient.lastName}.',
+          status: Value('waiting'),
         ),
       );
     }
 
-    // --- Insert 5 Insurances with Realistic Details ---
+    // --- Insert Insurances ---
     final List<String> insuranceCodes = ['A', 'B', 'C', 'D', 'E'];
     for (int i = 0; i < insuranceCodes.length; i++) {
       await into(insurances).insert(
         InsurancesCompanion.insert(
-          name: 'Insurance ${insuranceCodes[i]}',
+          name: 'Insurance \${insuranceCodes[i]}',
           details: 'This insurance covers general health, dental, and vision services with a wide network of providers.',
         ),
       );
     }
 
-    // --- Insert PharmacyInsurances: Each Pharmacy Gets 1-2 Random Insurances ---
+    // --- Insert Pharmacy Insurances ---
     final List<Insurance> insuranceList = await select(insurances).get();
     for (var pharmacy in pharmacyList) {
       final count = 1 + rand.nextInt(2);
@@ -650,7 +656,6 @@ class AppDatabase extends _$AppDatabase {
         );
       }
     }
-
     // --- Insert 30 Blockchain Transactions for Prescriptions with Controlled Medications ---
     final List<Prescription> prescriptionList = await select(prescriptions).get();
     for (int i = 0; i < 30; i++) {

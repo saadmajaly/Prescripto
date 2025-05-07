@@ -30,18 +30,18 @@ class _SinglePrescriptionState extends State<SinglePrescription> {
   void initState() {
     super.initState();
     final db = AppDatabase();
-    _prescriptionFuture = db.GetPrescription(widget.prescriptionId);
+    _prescriptionFuture = db.getPrescription(widget.prescriptionId);
     _prescriptionItemsFuture = _fetchItemsWithMedication(widget.prescriptionId);
   }
 
   Future<List<PrescriptionItemWithMedication>> _fetchItemsWithMedication(int prescriptionId) async {
     AppDatabase db = AppDatabase();
-    var items = await db.GetPrescriptionItems(prescriptionId);
+    var items = await db.getPrescriptionItems(prescriptionId);
 
     // For each PrescriptionItem, also fetch the Medication info
     var results = <PrescriptionItemWithMedication>[];
     for (final item in items) {
-      final medication = await db.GetMedicationInfo(item.medicationId);
+      final medication = await db.getMedicationInfo(item.medicationId);
       results.add(PrescriptionItemWithMedication(item, medication));
     }
     return results;

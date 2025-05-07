@@ -36,8 +36,11 @@ dependencies:
   cloud_firestore: ^5.6.7
   latlong2: ^0.9.1
   geolocator: ^13.0.0
-  drift: ^2.25.1
+  drift: ^2.6.0
   drift_flutter: ^0.2.4
+  drift_hrana: ^1.0.3
+  web_socket_channel: ^2.4.0
+  shelf_web_socket: ^1.0.3
   provider: ^6.1.2
   shared_preferences: ^2.5.2
   fl_chart: ^0.64.0
@@ -46,11 +49,12 @@ dependencies:
   shelf_cors_headers: ^0.1.5
   logging: ^1.0.0
   http: ^1.2.2
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-
+  uuid: ^4.4.0
+  connectivity_plus: ^5.0.0
   path_provider: any
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

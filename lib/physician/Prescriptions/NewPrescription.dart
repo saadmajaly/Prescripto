@@ -81,14 +81,14 @@ class _NewPrescriptionState extends State<NewPrescription> {
         db,
         includesControlled: _includesControlled,
         patientId: int.parse(selectedPatient!),
-        physicianId: 1, // TODO: use actual logged-in physician ID
         instructions: prescription['instructions'].text,
         medications: [
           {
             'medicationId': 1, // TODO: replace with actual medication ID
-            'dosage': prescription['drugName'].text,
-            'frequency': prescription['instructions'].text,
+            'name': prescription['drugName'].text,
+            'frequency': prescription['refills'],
             'quantity': 10,
+            'dosage':"500mg",
 
           }
         ],

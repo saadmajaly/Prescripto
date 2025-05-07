@@ -5,10 +5,10 @@ class TrackerBackEnd {
 
   // get today scheduled meds
   Future<List<Map<String, dynamic>>> getTodaysSchedule(String nationalId) async {
-    final prescriptions = await db.GetUserPrescriptions(nationalId);
+    final prescriptions = await db.getUserPrescriptions(nationalId);
     List<Map<String, dynamic>> schedule = [];
 
-    for (var prescription in await prescriptions.get()) {
+    for (var prescription in await prescriptions) {
       final prescriptionItems = await (db.select(db.prescriptionItems)
         ..where((p) => p.prescriptionId.equals(prescription.prescriptionId)))
           .get();
@@ -32,10 +32,10 @@ class TrackerBackEnd {
 
   // Get medication log (taken or skipped)
   Future<List<Map<String, dynamic>>> getMedicationLog(String nationalId) async {
-    final prescriptions = await db.GetUserPrescriptions(nationalId);
+    final prescriptions = await db.getUserPrescriptions(nationalId);
     List<Map<String, dynamic>> log = [];
 
-    for (var prescription in await prescriptions.get()) {
+    for (var prescription in await prescriptions) {
       final prescriptionItems = await (db.select(db.prescriptionItems)
         ..where((p) => p.prescriptionId.equals(prescription.prescriptionId)))
           .get();

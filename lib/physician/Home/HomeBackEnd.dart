@@ -24,7 +24,7 @@ class HomeBackend {
   /// Returns general statistics including total patients and prescriptions.
   Future<HomeStats> fetchStats() async {
     final patients = await _db.getAllPatients();
-    final prescriptions = await _db.GetAllPrescriptions();
+    final prescriptions = await _db.getAllPrescriptions();
 
     return HomeStats(
       patientCount: patients.length,
@@ -35,7 +35,7 @@ class HomeBackend {
 
   /// Fetches all prescriptions sorted from newest to oldest.
   Future<List<Prescription>> fetchRecentPrescriptions() async {
-    return (await _db.GetAllPrescriptions())
+    return (await _db.getAllPrescriptions())
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
@@ -43,7 +43,7 @@ class HomeBackend {
   /// Each index represents one day, ordered from oldest to newest.
   Future<List<int>> fetchWeeklyPrescriptionCounts() async {
     final now = DateTime.now();
-    final allPrescriptions = await _db.GetAllPrescriptions();
+    final allPrescriptions = await _db.getAllPrescriptions();
 
     List<int> dailyCounts = List.filled(7, 0);
 
@@ -62,7 +62,7 @@ class HomeBackend {
 
   /// Search prescriptions by ID, instructions, patient name, or medication name (case-insensitive).
   Future<List<Prescription>> searchPrescriptions(String query) async {
-    final prescriptions = await _db.GetAllPrescriptions();
+    final prescriptions = await _db.getAllPrescriptions();
     final patients = await _db.getAllPatients();
     final medications = await _db.select(_db.medications).get();
 
@@ -70,7 +70,7 @@ class HomeBackend {
 
     for (var p in prescriptions) {
       itemsByPrescription[p.prescriptionId] =
-          await _db.GetPrescriptionItems(p.prescriptionId);
+          await _db.getPrescriptionItems(p.prescriptionId);
     }
 
     return prescriptions.where((p) {

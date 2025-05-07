@@ -11,8 +11,8 @@ class HomeBackEnd {
 
   // get user prescriptions
   Future<List<Prescription>> getUserPrescriptions(String nationalId) async {
-    final query = await db.GetUserPrescriptions(nationalId);
-    return query.get();
+    final query = await db.getUserPrescriptions(nationalId);
+    return query;
   }
 
   // Get the next med assigned to the user

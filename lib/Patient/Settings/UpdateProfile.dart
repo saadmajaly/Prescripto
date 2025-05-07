@@ -122,7 +122,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       onPressed: () async {
                         var db = new AppDatabase();
                         SharedPreferences prefs = await SharedPreferences.getInstance();
-                        var ValidatePassword = await db.ValidatePassword(prefs.getString('NationalID') as String, _passwordController.text);
+                        var ValidatePassword = await db.validatePassword(prefs.getString('NationalID') as String, _passwordController.text);
                         if(ValidatePassword == true){
                           var BE = new SettingsBackEnd();
                           BE.UpdateProfile(_firstNameController.text, _lastNameController.text, _emailController.text, _phoneController.text);

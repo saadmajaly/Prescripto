@@ -8,7 +8,7 @@ class PrescriptionsBackEnd {
   // get the prescriptions from database
   Future<Map<String, List<Map<String, dynamic>>>> getPrescriptions(String nationalId) async {
     final user = await db.getUserByNatID(nationalId);
-    if (user == null) return {"active": [], "past": []}; // Return empty if user not found
+    if (user == null) return {"active": [], "past": []};
 
     // Get the user prescriptions
     final prescriptions = await (db.select(db.prescriptions)
