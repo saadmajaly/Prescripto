@@ -41,34 +41,54 @@ class _PharmacistHomeState extends State<PharmacistHome> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Prescriptions',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          const Text('New prescriptions awaiting review',
-              style: TextStyle(color: Colors.grey)),
-          const SizedBox(height: 24),
-          Expanded(
-            child: ListView(
-              children: [
-                ...pendingPrescriptions.map((p) => _buildCard(p, context)),
-                const SizedBox(height: 20),
-                const Text('Dispensed Prescriptions',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 8),
-                ...dispensedPrescriptions.map((p) => _buildCard(p, context)),
-              ],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      drawer: Drawer( // Replace with your shared drawer widget if available
+        child: ListView(
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.indigo[200]),
+              child: const Text('Prescripto', style: TextStyle(color: Colors.white, fontSize: 24)),
             ),
-          ),
-        ],
+            const ListTile(
+              leading: Icon(Icons.home),
+              title: Text('Home'),
+            ),
+            // Add more items as needed
+          ],
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Prescriptions',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            const Text('New prescriptions awaiting review',
+                style: TextStyle(color: Colors.grey)),
+            const SizedBox(height: 24),
+            Expanded(
+              child: ListView(
+                children: [
+                  ...pendingPrescriptions.map((p) => _buildCard(p, context)),
+                  const SizedBox(height: 20),
+                  const Text('Dispensed Prescriptions',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 8),
+                  ...dispensedPrescriptions.map((p) => _buildCard(p, context)),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
 
   Widget _buildCard(Map<String, dynamic> p, BuildContext ctx) {
     return Card(
