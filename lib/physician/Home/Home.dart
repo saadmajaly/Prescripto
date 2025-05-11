@@ -1,3 +1,5 @@
+// lib/physician/Home/physicianHome.dart
+
 import 'package:flutter/material.dart';
 import 'package:prescripto/CommonWeb/login_screen.dart';
 import 'package:prescripto/physician/Feedback/Feedback.dart';
@@ -19,12 +21,14 @@ class _PhysicianHomeState extends State<physicianHome> {
   final HomeBackend _backend = HomeBackend();
   late Future<HomeStats> _statsFuture;
   late Future<List<Prescription>> _recentFuture;
+  late Future<List<int>> _patientCountsFuture;
 
   @override
   void initState() {
     super.initState();
-    _statsFuture = _backend.fetchStats();
-    _recentFuture = _backend.fetchRecentPrescriptions();
+    _statsFuture         = _backend.fetchStats();
+    _recentFuture        = _backend.fetchRecentPrescriptions();
+    _patientCountsFuture = _backend.fetchWeeklyPatientRegistrations();
   }
 
   @override
@@ -43,10 +47,7 @@ class _PhysicianHomeState extends State<physicianHome> {
                 SizedBox(
                   height: 160,
                   width: double.infinity,
-                  child: Image.asset(
-                    'assets/PrescriptoLogo.png',
-                    fit: BoxFit.cover,
-                  ),
+                  child: Image.asset('assets/PrescriptoLogo.png', fit: BoxFit.cover),
                 ),
                 const SizedBox(height: 20),
                 _buildNavTile(Icons.home, 'Home', () {}),
@@ -72,6 +73,7 @@ class _PhysicianHomeState extends State<physicianHome> {
               ],
             ),
           ),
+
           // Main area
           Expanded(
             child: Padding(
@@ -79,8 +81,11 @@ class _PhysicianHomeState extends State<physicianHome> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Dashboard', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  const Text('Dashboard',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 20),
+
+                  // Stats cards
                   FutureBuilder<HomeStats>(
                     future: _statsFuture,
                     builder: (context, snapshot) {
@@ -110,16 +115,23 @@ class _PhysicianHomeState extends State<physicianHome> {
                     },
                   ),
                   const SizedBox(height: 20),
+
+                  // Charts row
                   Expanded(
                     child: Row(
                       children: [
-                        Expanded(flex: 2, child: _buildChart()),
+                        // ← now shows patient bar chart
+                        Expanded(flex: 2, child: _buildPatientChart()),
                         const SizedBox(width: 20),
+                        // keeps your prescription‐count bar chart
                         Expanded(flex: 2, child: _buildProductivityChart()),
                       ],
                     ),
                   ),
+
                   const SizedBox(height: 20),
+
+                  // Recent prescriptions
                   Expanded(
                     flex: 2,
                     child: FutureBuilder<List<Prescription>>(
@@ -145,47 +157,61 @@ class _PhysicianHomeState extends State<physicianHome> {
   }
 
   Widget _buildNavTile(IconData icon, String label, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(label),
-      onTap: onTap,
-    );
+    return ListTile(leading: Icon(icon), title: Text(label), onTap: onTap);
   }
 
-  Widget _buildChart() {
-    return Container(
-      height: 180,
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-      padding: const EdgeInsets.all(16),
-      child: LineChart(
-        LineChartData(
-          gridData: FlGridData(show: false),
-          titlesData: FlTitlesData(show: false),
-          borderData: FlBorderData(show: false),
-          lineBarsData: [
-            LineChartBarData(
-              spots: [
-                FlSpot(0, 1),
-                FlSpot(1, 1.5),
-                FlSpot(2, 1.4),
-                FlSpot(3, 3.4),
-                FlSpot(4, 2),
-                FlSpot(5, 2.2),
-                FlSpot(6, 1.8),
-              ],
-              isCurved: true,
-              color: Colors.indigo,
-              barWidth: 4,
-              isStrokeCapRound: true,
-              belowBarData: BarAreaData(show: false),
-              dotData: FlDotData(show: false),
+  Widget _buildPatientChart() {
+    return FutureBuilder<List<int>>(
+      future: _patientCountsFuture,
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snap.hasError) {
+          return Center(child: Text('Error: ${snap.error}'));
+        }
+        final counts = snap.data!;
+        final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+        return Container(
+          height: 180,
+          decoration:
+              BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+          padding: const EdgeInsets.all(16),
+          child: BarChart(
+            BarChartData(
+              alignment: BarChartAlignment.spaceAround,
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      final idx = value.toInt();
+                      if (idx < 0 || idx >= days.length) return const SizedBox();
+                      return Text(days[idx], style: const TextStyle(fontSize: 10));
+                    },
+                  ),
+                ),
+                leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              ),
+              barGroups: List.generate(counts.length, (i) {
+                return BarChartGroupData(
+                  x: i,
+                  barRods: [
+                    BarChartRodData(toY: counts[i].toDouble(), width: 16,color: Color(0xFF0D47A1)),
+                  ],
+                );
+              }),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
+  /// Your existing prescription‐count bar chart
   Widget _buildProductivityChart() {
     return Container(
       height: 180,
@@ -206,23 +232,26 @@ class _PhysicianHomeState extends State<physicianHome> {
               ),
             ),
             leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
             topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
           barGroups: [
-            BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 3, color: Colors.indigo)]),
-            BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 5, color: Colors.indigo)]),
-            BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 4, color: Colors.indigo)]),
-            BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 6, color: Colors.indigo)]),
-            BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 2, color: Colors.indigo)]),
-            BarChartGroupData(x: 5, barRods: [BarChartRodData(toY: 7, color: Colors.indigo)]),
-            BarChartGroupData(x: 6, barRods: [BarChartRodData(toY: 5, color: Colors.indigo)]),
+            BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 3, color: Color(0xFF0D47A1))]),
+            BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 5 ,color: Color(0xFF0D47A1))]),
+            BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 4,color: Color(0xFF0D47A1))]),
+            BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 6,color: Color(0xFF0D47A1))]),
+            BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 2,color: Color(0xFF0D47A1))]),
+            BarChartGroupData(x: 5, barRods: [BarChartRodData(toY: 7,color: Color(0xFF0D47A1))]),
+            BarChartGroupData(x: 6, barRods: [BarChartRodData(toY: 5,color: Color(0xFF0D47A1))]),
           ],
         ),
       ),
     );
   }
 }
+
+// ... keep StatCard and RecentPrescriptions classes unchanged ...
+
 
 class StatCard extends StatelessWidget {
   final String title;
@@ -349,7 +378,7 @@ class _RecentPrescriptionsState extends State<RecentPrescriptions> {
                           itemBuilder: (context, index) {
                             final item = _filtered[index];
                             return ListTile(
-                              leading: const Icon(Icons.description, color: Colors.indigo),
+                              leading: const Icon(Icons.description, color: Color.fromARGB(255, 84, 108, 244)),
                               title: Text('#${item.prescriptionId}'),
                               subtitle: Text(item.instructions ?? 'No instructions'),
                               contentPadding: const EdgeInsets.symmetric(vertical: 4),
