@@ -42,10 +42,19 @@ class _PharmacistHomeScreenState extends State<PharmacistHomeScreen> {
     InventoryScreen(),
     HelpScreen(),
     FeedBackScreen(),
+    WebLoginPage()
   ];
 
   void _onDestinationSelected(int index) {
     setState(() => _currentIndex = index);
+    if(index == 4){
+      var db = new AppDatabase();
+      var auth = new AuthProvider(db);
+      auth.logout();
+      Navigator.push(context,
+        MaterialPageRoute(builder: (context) => WebLoginPage()),
+      );
+    }
   }
 
   @override
@@ -101,6 +110,9 @@ class _PharmacistHomeScreenState extends State<PharmacistHomeScreen> {
                 selectedIcon: Icon(Icons.feedback_outlined),
                 label: Text('Feedback'),
               ),
+              NavigationRailDestination(icon: Icon(Icons.logout_outlined),
+                label: Text("logout"),
+              )
             ],
           ),
           const VerticalDivider(width: 1),

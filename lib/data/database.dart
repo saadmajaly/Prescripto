@@ -567,7 +567,7 @@ class AppDatabase extends _$AppDatabase {
     // --- Insert Prescriptions & Items ---
     final List<User> patientList   = await (select(users)..where((u) => u.role.equals('patient'))).get();
     final List<User> physicianList = await (select(users)..where((u) => u.role.equals('physician'))).get();
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 20; i++) {
       final patient   = patientList[rand.nextInt(patientList.length)];
       final physician = physicianList[rand.nextInt(physicianList.length)];
       final int prescriptionId = await into(prescriptions).insert(
@@ -600,7 +600,7 @@ class AppDatabase extends _$AppDatabase {
       await into(feedbacks).insert(
         FeedbacksCompanion.insert(
           userId: randomUser.id,
-          message: 'I, \${randomUser.firstName} \${randomUser.lastName}, am very satisfied with the service.',
+          message: 'I, ${randomUser.firstName} ${randomUser.lastName}, am very satisfied with the service.',
         ),
       );
     }
@@ -611,8 +611,8 @@ class AppDatabase extends _$AppDatabase {
       await into(auditLogs).insert(
         AuditLogsCompanion.insert(
           userId: randomUser.id,
-          action: 'ACTION_\$i',
-          details: Value('User \${randomUser.firstName} \${randomUser.lastName} performed action \$i.'),
+          action: 'ACTION_$i',
+          details: Value('User ${randomUser.firstName} ${randomUser.lastName} performed action $i.'),
         ),
       );
     }
@@ -625,7 +625,7 @@ class AppDatabase extends _$AppDatabase {
         EmergencyAccessRequestsCompanion.insert(
           patientId: randomPatient.id,
           physicianId: randomPhysician.id,
-          reason: 'Emergency: Immediate access needed for \${randomPatient.firstName} \${randomPatient.lastName}.',
+          reason: 'Emergency: Immediate access needed for ${randomPatient.firstName} ${randomPatient.lastName}.',
           status: Value('waiting'),
         ),
       );
@@ -636,7 +636,7 @@ class AppDatabase extends _$AppDatabase {
     for (int i = 0; i < insuranceCodes.length; i++) {
       await into(insurances).insert(
         InsurancesCompanion.insert(
-          name: 'Insurance \${insuranceCodes[i]}',
+          name: 'Insurance ${insuranceCodes[i]}',
           details: 'This insurance covers general health, dental, and vision services with a wide network of providers.',
         ),
       );

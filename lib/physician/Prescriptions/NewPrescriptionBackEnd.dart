@@ -57,27 +57,27 @@ class PrescriptionService {
         ),
       );
 
-      // if (includesControlled) {
-      //   try {
-      //     final txHash = await _infura.logPrescriptionOnChain(
-      //       from: '<YOUR_WALLET_ADDRESS>',       // ex: '0xAbC123…'
-      //       to: '<YOUR_CONTRACT_OR_NULL>',       // optional
-      //       prescriptionId: prescriptionId,
-      //       patientId: patientId,
-      //       includesControlled: true,
-      //
-      //     );
-      //     await db.into(db.blockchainTransactions).insert(
-      //         BlockchainTransactionsCompanion.insert(
-      //           prescriptionId: prescriptionId,
-      //           transactionHash: txHash,
-      //         ));
-      //     print('Prescription logged on-chain: $txHash');
-      //   } catch (e) {
-      //     print('Blockchain logging failed: $e');
-      //   }
-      //
-      // }
+      if (includesControlled) {
+        try {
+          final txHash = await _infura.logPrescriptionOnChain(
+            from: '<YOUR_WALLET_ADDRESS>',       // ex: '0xAbC123…'
+            to: '<YOUR_CONTRACT_OR_NULL>',       // optional
+            prescriptionId: prescriptionId,
+            patientId: patientId,
+            includesControlled: true,
+
+          );
+          await db.into(db.blockchainTransactions).insert(
+              BlockchainTransactionsCompanion.insert(
+                prescriptionId: prescriptionId,
+                transactionHash: txHash,
+              ));
+          print('Prescription logged on-chain: $txHash');
+        } catch (e) {
+          print('Blockchain logging failed: $e');
+        }
+
+      }
       // ثانيًا: نضيف العناصر (الأدوية) في جدول PrescriptionItems
       for (final med in medications) {
         // a) Create or fetch the medication row

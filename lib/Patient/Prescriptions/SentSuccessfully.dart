@@ -161,7 +161,7 @@ class _PrescriptionSentSuccessfullyState
                   FadeTransition(
                     opacity: _subtextFade,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => Prescriptions())),
+                      onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => MainScreen())),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue.shade700,
                         padding:
