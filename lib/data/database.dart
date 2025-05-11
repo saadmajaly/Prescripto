@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-
 import 'package:drift/drift.dart';
 import 'package:drift_hrana/drift_hrana.dart';
 import 'package:flutter/foundation.dart';

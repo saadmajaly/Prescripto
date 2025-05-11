@@ -1,3 +1,4 @@
+
 import 'package:prescripto/data/database.dart';
 
 /// Data model that holds the count of patients, prescriptions, and the fetch timestamp.
@@ -45,15 +46,40 @@ class HomeBackend {
     final now = DateTime.now();
     final allPrescriptions = await _db.getAllPrescriptions();
 
-    List<int> dailyCounts = List.filled(7, 0);
+    final dailyCounts = List<int>.filled(7, 0);
 
     for (final p in allPrescriptions) {
       final created = p.createdAt;
-      final dayDiff = now.difference(DateTime(created.year, created.month, created.day)).inDays;
+      final dayDiff = now
+        .difference(DateTime(created.year, created.month, created.day))
+        .inDays;
 
       // Only consider prescriptions created within the last 7 days
       if (dayDiff >= 0 && dayDiff <= 6) {
-        dailyCounts[6 - dayDiff] += 1; // Store in reverse order: oldest → newest
+        dailyCounts[6 - dayDiff] += 1; // 0 = oldest, 6 = today
+      }
+    }
+
+    return dailyCounts;
+  }
+
+  /// Returns a list of new‐patient registration counts for the past 7 days.
+  /// Each index represents one day, ordered from oldest to newest.
+  Future<List<int>> fetchWeeklyPatientRegistrations() async {
+    final now = DateTime.now();
+    final allPatients = await _db.getAllPatients();
+
+    final dailyCounts = List<int>.filled(7, 0);
+
+    for (final u in allPatients) {
+      final created = u.createdAt;
+      final dayDiff = now
+        .difference(DateTime(created.year, created.month, created.day))
+        .inDays;
+
+      // Only consider registrations within the last 7 days
+      if (dayDiff >= 0 && dayDiff <= 6) {
+        dailyCounts[6 - dayDiff] += 1; // 0 = oldest, 6 = today
       }
     }
 
@@ -66,16 +92,17 @@ class HomeBackend {
     final patients = await _db.getAllPatients();
     final medications = await _db.select(_db.medications).get();
 
+    // Preload items for each prescription
     final itemsByPrescription = <int, List<PrescriptionItem>>{};
-
     for (var p in prescriptions) {
       itemsByPrescription[p.prescriptionId] =
-          await _db.getPrescriptionItems(p.prescriptionId);
+        await _db.getPrescriptionItems(p.prescriptionId);
     }
 
-    return prescriptions.where((p) {
-      final idMatch = p.prescriptionId.toString().contains(query);
-      final instructionsMatch = (p.instructions ?? '').toLowerCase().contains(query.toLowerCase());
+    final lower = query.toLowerCase();
+    final results = prescriptions.where((p) {
+      final idMatch = p.prescriptionId.toString().contains(lower);
+      final instrMatch = (p.instructions ?? '').toLowerCase().contains(lower);
 
       // Match patient name
       final patient = patients.firstWhere(
@@ -92,11 +119,12 @@ class HomeBackend {
           createdAt: DateTime.now(),
         ),
       );
-      final patientNameMatch =
-          '${patient.firstName} ${patient.lastName}'.toLowerCase().contains(query.toLowerCase());
+      final nameMatch = '${patient.firstName} ${patient.lastName}'
+        .toLowerCase()
+        .contains(lower);
 
       // Match medication names
-      final medNameMatch = (itemsByPrescription[p.prescriptionId] ?? []).any((item) {
+      final medMatch = (itemsByPrescription[p.prescriptionId] ?? []).any((item) {
         final med = medications.firstWhere(
           (m) => m.medicationId == item.medicationId,
           orElse: () => Medication(
@@ -106,11 +134,14 @@ class HomeBackend {
             controlledSubstance: false,
           ),
         );
-        return med.name.toLowerCase().contains(query.toLowerCase());
+        return med.name.toLowerCase().contains(lower);
       });
 
-      return idMatch || instructionsMatch || patientNameMatch || medNameMatch;
-    }).toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return idMatch || instrMatch || nameMatch || medMatch;
+    }).toList();
+
+    // Sort newest first
+    results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return results;
   }
 }
