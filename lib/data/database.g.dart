@@ -1587,6 +1587,12 @@ class $PrescriptionsTable extends Prescriptions
   late final GeneratedColumn<int> physicianId = GeneratedColumn<int>(
       'physician_id', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _pharmacyIdMeta =
+      const VerificationMeta('pharmacyId');
+  @override
+  late final GeneratedColumn<int> pharmacyId = GeneratedColumn<int>(
+      'pharmacy_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -1609,8 +1615,15 @@ class $PrescriptionsTable extends Prescriptions
       'instructions', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
   @override
-  List<GeneratedColumn> get $columns =>
-      [prescriptionId, patientId, physicianId, createdAt, status, instructions];
+  List<GeneratedColumn> get $columns => [
+        prescriptionId,
+        patientId,
+        physicianId,
+        pharmacyId,
+        createdAt,
+        status,
+        instructions
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1641,6 +1654,12 @@ class $PrescriptionsTable extends Prescriptions
     } else if (isInserting) {
       context.missing(_physicianIdMeta);
     }
+    if (data.containsKey('pharmacy_id')) {
+      context.handle(
+          _pharmacyIdMeta,
+          pharmacyId.isAcceptableOrUnknown(
+              data['pharmacy_id']!, _pharmacyIdMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -1670,6 +1689,8 @@ class $PrescriptionsTable extends Prescriptions
           .read(DriftSqlType.int, data['${effectivePrefix}patient_id'])!,
       physicianId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}physician_id'])!,
+      pharmacyId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}pharmacy_id']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       status: attachedDatabase.typeMapping
@@ -1689,6 +1710,7 @@ class Prescription extends DataClass implements Insertable<Prescription> {
   final int prescriptionId;
   final int patientId;
   final int physicianId;
+  final int? pharmacyId;
   final DateTime createdAt;
   final String status;
   final String? instructions;
@@ -1696,6 +1718,7 @@ class Prescription extends DataClass implements Insertable<Prescription> {
       {required this.prescriptionId,
       required this.patientId,
       required this.physicianId,
+      this.pharmacyId,
       required this.createdAt,
       required this.status,
       this.instructions});
@@ -1705,6 +1728,9 @@ class Prescription extends DataClass implements Insertable<Prescription> {
     map['prescription_id'] = Variable<int>(prescriptionId);
     map['patient_id'] = Variable<int>(patientId);
     map['physician_id'] = Variable<int>(physicianId);
+    if (!nullToAbsent || pharmacyId != null) {
+      map['pharmacy_id'] = Variable<int>(pharmacyId);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['status'] = Variable<String>(status);
     if (!nullToAbsent || instructions != null) {
@@ -1718,6 +1744,9 @@ class Prescription extends DataClass implements Insertable<Prescription> {
       prescriptionId: Value(prescriptionId),
       patientId: Value(patientId),
       physicianId: Value(physicianId),
+      pharmacyId: pharmacyId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pharmacyId),
       createdAt: Value(createdAt),
       status: Value(status),
       instructions: instructions == null && nullToAbsent
@@ -1733,6 +1762,7 @@ class Prescription extends DataClass implements Insertable<Prescription> {
       prescriptionId: serializer.fromJson<int>(json['prescriptionId']),
       patientId: serializer.fromJson<int>(json['patientId']),
       physicianId: serializer.fromJson<int>(json['physicianId']),
+      pharmacyId: serializer.fromJson<int?>(json['pharmacyId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       status: serializer.fromJson<String>(json['status']),
       instructions: serializer.fromJson<String?>(json['instructions']),
@@ -1745,6 +1775,7 @@ class Prescription extends DataClass implements Insertable<Prescription> {
       'prescriptionId': serializer.toJson<int>(prescriptionId),
       'patientId': serializer.toJson<int>(patientId),
       'physicianId': serializer.toJson<int>(physicianId),
+      'pharmacyId': serializer.toJson<int?>(pharmacyId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'status': serializer.toJson<String>(status),
       'instructions': serializer.toJson<String?>(instructions),
@@ -1755,6 +1786,7 @@ class Prescription extends DataClass implements Insertable<Prescription> {
           {int? prescriptionId,
           int? patientId,
           int? physicianId,
+          Value<int?> pharmacyId = const Value.absent(),
           DateTime? createdAt,
           String? status,
           Value<String?> instructions = const Value.absent()}) =>
@@ -1762,6 +1794,7 @@ class Prescription extends DataClass implements Insertable<Prescription> {
         prescriptionId: prescriptionId ?? this.prescriptionId,
         patientId: patientId ?? this.patientId,
         physicianId: physicianId ?? this.physicianId,
+        pharmacyId: pharmacyId.present ? pharmacyId.value : this.pharmacyId,
         createdAt: createdAt ?? this.createdAt,
         status: status ?? this.status,
         instructions:
@@ -1775,6 +1808,8 @@ class Prescription extends DataClass implements Insertable<Prescription> {
       patientId: data.patientId.present ? data.patientId.value : this.patientId,
       physicianId:
           data.physicianId.present ? data.physicianId.value : this.physicianId,
+      pharmacyId:
+          data.pharmacyId.present ? data.pharmacyId.value : this.pharmacyId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       status: data.status.present ? data.status.value : this.status,
       instructions: data.instructions.present
@@ -1789,6 +1824,7 @@ class Prescription extends DataClass implements Insertable<Prescription> {
           ..write('prescriptionId: $prescriptionId, ')
           ..write('patientId: $patientId, ')
           ..write('physicianId: $physicianId, ')
+          ..write('pharmacyId: $pharmacyId, ')
           ..write('createdAt: $createdAt, ')
           ..write('status: $status, ')
           ..write('instructions: $instructions')
@@ -1797,8 +1833,8 @@ class Prescription extends DataClass implements Insertable<Prescription> {
   }
 
   @override
-  int get hashCode => Object.hash(
-      prescriptionId, patientId, physicianId, createdAt, status, instructions);
+  int get hashCode => Object.hash(prescriptionId, patientId, physicianId,
+      pharmacyId, createdAt, status, instructions);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1806,6 +1842,7 @@ class Prescription extends DataClass implements Insertable<Prescription> {
           other.prescriptionId == this.prescriptionId &&
           other.patientId == this.patientId &&
           other.physicianId == this.physicianId &&
+          other.pharmacyId == this.pharmacyId &&
           other.createdAt == this.createdAt &&
           other.status == this.status &&
           other.instructions == this.instructions);
@@ -1815,6 +1852,7 @@ class PrescriptionsCompanion extends UpdateCompanion<Prescription> {
   final Value<int> prescriptionId;
   final Value<int> patientId;
   final Value<int> physicianId;
+  final Value<int?> pharmacyId;
   final Value<DateTime> createdAt;
   final Value<String> status;
   final Value<String?> instructions;
@@ -1822,6 +1860,7 @@ class PrescriptionsCompanion extends UpdateCompanion<Prescription> {
     this.prescriptionId = const Value.absent(),
     this.patientId = const Value.absent(),
     this.physicianId = const Value.absent(),
+    this.pharmacyId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.status = const Value.absent(),
     this.instructions = const Value.absent(),
@@ -1830,6 +1869,7 @@ class PrescriptionsCompanion extends UpdateCompanion<Prescription> {
     this.prescriptionId = const Value.absent(),
     required int patientId,
     required int physicianId,
+    this.pharmacyId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.status = const Value.absent(),
     this.instructions = const Value.absent(),
@@ -1839,6 +1879,7 @@ class PrescriptionsCompanion extends UpdateCompanion<Prescription> {
     Expression<int>? prescriptionId,
     Expression<int>? patientId,
     Expression<int>? physicianId,
+    Expression<int>? pharmacyId,
     Expression<DateTime>? createdAt,
     Expression<String>? status,
     Expression<String>? instructions,
@@ -1847,6 +1888,7 @@ class PrescriptionsCompanion extends UpdateCompanion<Prescription> {
       if (prescriptionId != null) 'prescription_id': prescriptionId,
       if (patientId != null) 'patient_id': patientId,
       if (physicianId != null) 'physician_id': physicianId,
+      if (pharmacyId != null) 'pharmacy_id': pharmacyId,
       if (createdAt != null) 'created_at': createdAt,
       if (status != null) 'status': status,
       if (instructions != null) 'instructions': instructions,
@@ -1857,6 +1899,7 @@ class PrescriptionsCompanion extends UpdateCompanion<Prescription> {
       {Value<int>? prescriptionId,
       Value<int>? patientId,
       Value<int>? physicianId,
+      Value<int?>? pharmacyId,
       Value<DateTime>? createdAt,
       Value<String>? status,
       Value<String?>? instructions}) {
@@ -1864,6 +1907,7 @@ class PrescriptionsCompanion extends UpdateCompanion<Prescription> {
       prescriptionId: prescriptionId ?? this.prescriptionId,
       patientId: patientId ?? this.patientId,
       physicianId: physicianId ?? this.physicianId,
+      pharmacyId: pharmacyId ?? this.pharmacyId,
       createdAt: createdAt ?? this.createdAt,
       status: status ?? this.status,
       instructions: instructions ?? this.instructions,
@@ -1881,6 +1925,9 @@ class PrescriptionsCompanion extends UpdateCompanion<Prescription> {
     }
     if (physicianId.present) {
       map['physician_id'] = Variable<int>(physicianId.value);
+    }
+    if (pharmacyId.present) {
+      map['pharmacy_id'] = Variable<int>(pharmacyId.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -1900,6 +1947,7 @@ class PrescriptionsCompanion extends UpdateCompanion<Prescription> {
           ..write('prescriptionId: $prescriptionId, ')
           ..write('patientId: $patientId, ')
           ..write('physicianId: $physicianId, ')
+          ..write('pharmacyId: $pharmacyId, ')
           ..write('createdAt: $createdAt, ')
           ..write('status: $status, ')
           ..write('instructions: $instructions')
@@ -4898,6 +4946,7 @@ typedef $$PrescriptionsTableCreateCompanionBuilder = PrescriptionsCompanion
   Value<int> prescriptionId,
   required int patientId,
   required int physicianId,
+  Value<int?> pharmacyId,
   Value<DateTime> createdAt,
   Value<String> status,
   Value<String?> instructions,
@@ -4907,6 +4956,7 @@ typedef $$PrescriptionsTableUpdateCompanionBuilder = PrescriptionsCompanion
   Value<int> prescriptionId,
   Value<int> patientId,
   Value<int> physicianId,
+  Value<int?> pharmacyId,
   Value<DateTime> createdAt,
   Value<String> status,
   Value<String?> instructions,
@@ -4930,6 +4980,9 @@ class $$PrescriptionsTableFilterComposer
 
   ColumnFilters<int> get physicianId => $composableBuilder(
       column: $table.physicianId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get pharmacyId => $composableBuilder(
+      column: $table.pharmacyId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -4960,6 +5013,9 @@ class $$PrescriptionsTableOrderingComposer
   ColumnOrderings<int> get physicianId => $composableBuilder(
       column: $table.physicianId, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get pharmacyId => $composableBuilder(
+      column: $table.pharmacyId, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -4988,6 +5044,9 @@ class $$PrescriptionsTableAnnotationComposer
 
   GeneratedColumn<int> get physicianId => $composableBuilder(
       column: $table.physicianId, builder: (column) => column);
+
+  GeneratedColumn<int> get pharmacyId => $composableBuilder(
+      column: $table.pharmacyId, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -5028,6 +5087,7 @@ class $$PrescriptionsTableTableManager extends RootTableManager<
             Value<int> prescriptionId = const Value.absent(),
             Value<int> patientId = const Value.absent(),
             Value<int> physicianId = const Value.absent(),
+            Value<int?> pharmacyId = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<String> status = const Value.absent(),
             Value<String?> instructions = const Value.absent(),
@@ -5036,6 +5096,7 @@ class $$PrescriptionsTableTableManager extends RootTableManager<
             prescriptionId: prescriptionId,
             patientId: patientId,
             physicianId: physicianId,
+            pharmacyId: pharmacyId,
             createdAt: createdAt,
             status: status,
             instructions: instructions,
@@ -5044,6 +5105,7 @@ class $$PrescriptionsTableTableManager extends RootTableManager<
             Value<int> prescriptionId = const Value.absent(),
             required int patientId,
             required int physicianId,
+            Value<int?> pharmacyId = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<String> status = const Value.absent(),
             Value<String?> instructions = const Value.absent(),
@@ -5052,6 +5114,7 @@ class $$PrescriptionsTableTableManager extends RootTableManager<
             prescriptionId: prescriptionId,
             patientId: patientId,
             physicianId: physicianId,
+            pharmacyId: pharmacyId,
             createdAt: createdAt,
             status: status,
             instructions: instructions,

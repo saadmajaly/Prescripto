@@ -187,7 +187,7 @@ class _SinglePrescriptionState extends State<SinglePrescription> {
 
                         onPressed: () {
                           final AppDatabase datab = new AppDatabase();
-                          Navigator.push(context,MaterialPageRoute(builder: (context) => SendToPharmacy(datab)));},
+                          Navigator.push(context,MaterialPageRoute(builder: (context) => SendToPharmacy(widget.prescriptionId,datab)));},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           padding: const EdgeInsets.symmetric(vertical: 16.0),

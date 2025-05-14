@@ -10,7 +10,8 @@ import 'package:prescripto/data/database.dart';
 
 class SendToPharmacy extends StatefulWidget {
   final AppDatabase database;
-  const SendToPharmacy(this.database, { Key? key }) : super(key: key);
+  final int PrescriptionId;
+  const SendToPharmacy(this.PrescriptionId,this.database, { Key? key }) : super(key: key);
 
   @override
   _SendToPharmacyState createState() => _SendToPharmacyState();
@@ -274,7 +275,11 @@ class _SendToPharmacyState extends State<SendToPharmacy> {
                 child: ElevatedButton(
                   onPressed: _selectedId == null
                       ? null
-                      : () {
+                      : () async {
+                    final success = await widget.database.sendPrescriptionToThePharmacy(
+                      widget.PrescriptionId,
+                      _selectedId!,
+                    );
                     final chosen = _all.firstWhere(
                             (p) => p.pharmacyId == _selectedId);
                     Navigator.push(context,

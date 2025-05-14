@@ -34,7 +34,7 @@ class _PharmacistHomeState extends State<PharmacistHome> {
     final prescriptions = await homeBackend.getAllPrescriptions();
     setState(() {
       pendingPrescriptions =
-          prescriptions.where((p) => p['status'] == 'pending').toList();
+          prescriptions.where((p) => p['status'] == 'waiting').toList();
       dispensedPrescriptions =
           prescriptions.where((p) => p['status'] == 'dispensed').toList();
     });
@@ -105,7 +105,7 @@ class _PharmacistHomeState extends State<PharmacistHome> {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(p['physicianName'], style: const TextStyle(color: Colors.grey)),
-        trailing: p['status'] == 'pending'
+        trailing: p['status'] == 'waiting'
             ? ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey[300],
