@@ -66,23 +66,6 @@ class _Settings extends State<Settings> {
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Notifications',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          ListTile(
-            title: const Text('Push Notifications'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {},
-          ),
-          const Divider(),
-
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(
               'About',
               style: TextStyle(
                 fontSize: 16,

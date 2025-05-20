@@ -20,7 +20,6 @@ class Users extends Table {
   DateTimeColumn get createdAt   => dateTime().withDefault(currentDateAndTime)();
 }
 
-// PHARMACIES: Stores pharmacy details.
 class Pharmacies extends Table {
   IntColumn get pharmacyId        => integer().autoIncrement()();
   TextColumn get name             => text().withLength(min: 1, max: 100)();

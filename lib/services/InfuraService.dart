@@ -1,18 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-/// A minimal service for interacting with Infura’s Polygon Mainnet JSON-RPC endpoint.
-/// Update the _projectId with your own Infura Project ID.
+
 class InfuraService {
-  // Your Infura Project ID
   static const String _projectId = '86cea06e780c450c9af7cfc1f8586952';
 
-  // Polygon Mainnet RPC URL
   static final Uri _rpcUrl = Uri.parse(
     'https://polygon-mainnet.infura.io/v3/$_projectId',
   );
 
-  /// Sends a JSON-RPC request and returns the decoded JSON response.
+  // Sends JSON-RPC request and returns the JSON response.
   Future<Map<String, dynamic>> _postRpc(Map<String, dynamic> payload) async {
     final response = await http.post(
       _rpcUrl,

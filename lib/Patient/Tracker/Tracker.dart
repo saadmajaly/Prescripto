@@ -46,8 +46,6 @@ class _TrackerState extends State<Tracker> {
           'Medication Tracker',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.black,
         elevation: 0,
       ),
       body: isLoading

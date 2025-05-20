@@ -163,14 +163,6 @@ class _WebLoginPageState extends State<WebLoginPage>
                             ),
                             SizedBox(height: 10),
                             TextButton(
-                              onPressed: () {},
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.black,
-                                textStyle: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              child: Text('Forgot your password?'),
-                            ),
-                            TextButton(
                               onPressed: () {
                                 Navigator.push(
                                   context,
