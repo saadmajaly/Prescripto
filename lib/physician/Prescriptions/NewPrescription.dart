@@ -406,6 +406,12 @@ class _NewPrescriptionState extends State<NewPrescription> {
               MaterialPageRoute(builder: (_) => const physicianHome()),
             ),
           ),
+            ListTile(
+                  leading: const Icon(Icons.edit),
+                  title: const Text('New Prescriptions'),
+                  onTap: () {
+                 },
+                ),
           ListTile(
             leading: const Icon(Icons.person),
             title: const Text('Patients'),
