@@ -107,7 +107,7 @@ class _PhysicianHomeState extends State<physicianHome> {
                           StatCard(
                             title: 'Prescriptions',
                             value: stats.prescriptionCount.toString(),
-                            footnote: 'updated hourly',
+                            footnote: 'as of today',
                             topRightIcon: Icons.medical_services,
                           ),
                         ],
@@ -160,55 +160,95 @@ class _PhysicianHomeState extends State<physicianHome> {
     return ListTile(leading: Icon(icon), title: Text(label), onTap: onTap);
   }
 
-  Widget _buildPatientChart() {
-    return FutureBuilder<List<int>>(
-      future: _patientCountsFuture,
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snap.hasError) {
-          return Center(child: Text('Error: ${snap.error}'));
-        }
-        final counts = snap.data!;
-        final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+ Widget _buildPatientChart() {
+  return FutureBuilder<List<int>>(
+    future: _patientCountsFuture,
+    builder: (context, snap) {
+      if (snap.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (snap.hasError) {
+        return Center(child: Text('Error: ${snap.error}'));
+      }
 
-        return Container(
-          height: 180,
-          decoration:
-              BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-          padding: const EdgeInsets.all(16),
-          child: BarChart(
-            BarChartData(
-              alignment: BarChartAlignment.spaceAround,
-              borderData: FlBorderData(show: false),
-              titlesData: FlTitlesData(
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, meta) {
-                      final idx = value.toInt();
-                      if (idx < 0 || idx >= days.length) return const SizedBox();
-                      return Text(days[idx], style: const TextStyle(fontSize: 10));
-                    },
+      final counts = snap.data!;
+      final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+      return Container(
+        height: 180,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: BarChart(
+          BarChartData(
+            alignment: BarChartAlignment.spaceAround,
+            borderData: FlBorderData(show: false),
+            titlesData: FlTitlesData(
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 28,
+                  getTitlesWidget: (value, meta) {
+                    final idx = value.toInt();
+                    if (idx < 0 || idx >= days.length) return const SizedBox();
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        days[idx],
+                        style: const TextStyle(fontSize: 10),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 28,
+                  interval: 1,
+                  getTitlesWidget: (value, meta) {
+                    return Text(
+                      value.toInt().toString(),
+                      style: const TextStyle(fontSize: 10),
+                    );
+                  },
+                ),
+                axisNameWidget: Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    'Number of Patients',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                 ),
-                leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                axisNameSize: 32,
               ),
-              barGroups: List.generate(counts.length, (i) {
-                return BarChartGroupData(
-                  x: i,
-                  barRods: [
-                    BarChartRodData(toY: counts[i].toDouble(), width: 16,color: Color(0xFF0D47A1)),
-                  ],
-                );
-              }),
+              topTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
             ),
+            barGroups: List.generate(counts.length, (i) {
+              return BarChartGroupData(
+                x: i,
+                barRods: [
+                  BarChartRodData(
+                    toY: counts[i].toDouble(),
+                    width: 16,
+                    color: const Color(0xFF0D47A1),
+                  ),
+                ],
+              );
+            }),
           ),
-        );
-      },
-    );
+        ),
+      );
+    },
+  );
+}
+
   }
 
   /// Your existing prescription‐count bar chart
@@ -231,10 +271,28 @@ class _PhysicianHomeState extends State<physicianHome> {
                 },
               ),
             ),
-            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          ),
+              leftTitles: AxisTitles(
+    sideTitles: SideTitles(
+      showTitles: false,
+ 
+  
+    ),
+    axisNameWidget: Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        'Number of prescrption',
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      ),
+    ),
+    axisNameSize: 32,
+  ),
+  topTitles: AxisTitles(
+    sideTitles: SideTitles(showTitles: false),
+  ),
+  rightTitles: AxisTitles(
+    sideTitles: SideTitles(showTitles: false),
+  ),
+),
           barGroups: [
             BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 3, color: Color(0xFF0D47A1))]),
             BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 5 ,color: Color(0xFF0D47A1))]),
@@ -248,7 +306,7 @@ class _PhysicianHomeState extends State<physicianHome> {
       ),
     );
   }
-}
+
 
 // ... keep StatCard and RecentPrescriptions classes unchanged ...
 
