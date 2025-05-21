@@ -1,4 +1,3 @@
-// lib/physician/Home/physicianHome.dart
 
 import 'package:flutter/material.dart';
 import 'package:prescripto/CommonWeb/login_screen.dart';

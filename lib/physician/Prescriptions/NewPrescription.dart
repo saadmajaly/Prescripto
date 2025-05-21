@@ -129,6 +129,9 @@ class _NewPrescriptionState extends State<NewPrescription> {
       SnackBar(
         content: Text(
           success
+
+
+           
               ? 'Prescription submitted successfully!'
               : 'Failed to submit prescription.',
         ),
