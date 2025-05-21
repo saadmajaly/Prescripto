@@ -135,18 +135,6 @@ class _WebLoginPageState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 10),
-Center(
-  child: TextButton(
-    onPressed: () {},
-    child: const Text(
-      'Forgot password?',
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        color: Color.fromARGB(255, 0, 0, 0), // Change color to blue or your desired color
-      ),
-    ),
-  ),
-),
 const SizedBox(height: 10),
 Row(
   mainAxisAlignment: MainAxisAlignment.center,

@@ -101,7 +101,6 @@ class _EditUserPageState extends State<EditUserPage> {
           key: _formKey,
           child: ListView(
             children: [
-              // Name fields
               TextFormField(
                 controller: _firstNameCtrl,
                 decoration: const InputDecoration(labelText: 'First Name'),
@@ -113,7 +112,7 @@ class _EditUserPageState extends State<EditUserPage> {
                 validator: (v) => v!.isEmpty ? 'Required' : null,
               ),
 
-              // Contact info
+              // Contact info..
               TextFormField(
                 controller: _emailCtrl,
                 decoration: const InputDecoration(labelText: 'Email'),
@@ -139,7 +138,7 @@ class _EditUserPageState extends State<EditUserPage> {
                 ),
               ),
 
-              // Role dropdown
+              // Roles list dropdown
               DropdownButtonFormField<String>(
                 value: _selectedRole,
                 decoration: const InputDecoration(labelText: 'Role'),
