@@ -422,20 +422,20 @@ class AppDatabase extends _$AppDatabase {
       ),
     );
     // --- Insert 200 Patients ---
-    // for (int i = 0; i < 200; i++) {
-    //   await into(users).insert(
-    //     UsersCompanion.insert(
-    //       firstName: patientFirstNames[rand.nextInt(patientFirstNames.length)],
-    //       lastName: patientLastNames[rand.nextInt(patientLastNames.length)],
-    //       email: 'patient$i@example.com',
-    //       phone: '555-00${rand.nextInt(90).toString().padLeft(2, "0")}',
-    //       nationalId: 'P$i${rand.nextInt(100000)}',
-    //       syndicateNumber: const Value(null),
-    //       passwordHash: 'password',
-    //       role: 'patient',
-    //     ),
-    //   );
-    // }
+    for (int i = 0; i < 19; i++) {
+      await into(users).insert(
+        UsersCompanion.insert(
+          firstName: patientFirstNames[rand.nextInt(patientFirstNames.length)],
+          lastName: patientLastNames[rand.nextInt(patientLastNames.length)],
+          email: 'patient$i@example.com',
+          phone: '555-00${rand.nextInt(90).toString().padLeft(2, "0")}',
+          nationalId: 'P$i${rand.nextInt(100000)}',
+          syndicateNumber: const Value(null),
+          passwordHash: 'password',
+          role: 'patient',
+        ),
+      );
+    }
 
     await into(users).insert(
       UsersCompanion.insert(
@@ -450,20 +450,20 @@ class AppDatabase extends _$AppDatabase {
       ),
     );
     // --- Insert 100 Physicians ---
-    // for (int i = 0; i < 100; i++) {
-    //   await into(users).insert(
-    //     UsersCompanion.insert(
-    //       firstName: doctorFirstNames[rand.nextInt(doctorFirstNames.length)],
-    //       lastName: doctorLastNames[rand.nextInt(doctorLastNames.length)],
-    //       email: 'physician$i@hospital.com',
-    //       phone: '555-20${rand.nextInt(90).toString().padLeft(2, "0")}',
-    //       nationalId: 'D$i${rand.nextInt(100000)}',
-    //       syndicateNumber: Value('DOC-${1000 + i}'),
-    //       passwordHash: 'password',
-    //       role: 'physician',
-    //     ),
-    //   );
-    // }
+    for (int i = 0; i < 100; i++) {
+      await into(users).insert(
+        UsersCompanion.insert(
+          firstName: doctorFirstNames[rand.nextInt(doctorFirstNames.length)],
+          lastName: doctorLastNames[rand.nextInt(doctorLastNames.length)],
+          email: 'physician$i@hospital.com',
+          phone: '555-20${rand.nextInt(90).toString().padLeft(2, "0")}',
+          nationalId: 'D$i${rand.nextInt(100000)}',
+          syndicateNumber: Value('DOC-${1000 + i}'),
+          passwordHash: 'password',
+          role: 'physician',
+        ),
+      );
+    }
 
     await into(users).insert(
       UsersCompanion.insert(
@@ -577,105 +577,105 @@ class AppDatabase extends _$AppDatabase {
     // --- Insert Prescriptions & Items ---
     final List<User> patientList   = await (select(users)..where((u) => u.role.equals('patient'))).get();
     final List<User> physicianList = await (select(users)..where((u) => u.role.equals('physician'))).get();
-    // for (int i = 0; i < 20; i++) {
-    //   final patient   = patientList[rand.nextInt(patientList.length)];
-    //   final physician = physicianList[rand.nextInt(physicianList.length)];
-    //   final int prescriptionId = await into(prescriptions).insert(
-    //     PrescriptionsCompanion.insert(
-    //       patientId: patient.id,
-    //       physicianId: physician.id,
-    //       status: Value('pending'),
-    //       instructions: Value('Take with meals, preferably after food.'),
-    //     ),
-    //   );
-    //   int itemsCount = 1 + rand.nextInt(3);
-    //   for (int j = 0; j < itemsCount; j++) {
-    //     final med = medicationList[rand.nextInt(medicationList.length)];
-    //     await into(prescriptionItems).insert(
-    //       PrescriptionItemsCompanion.insert(
-    //         prescriptionId: prescriptionId,
-    //         medicationId: med.medicationId,
-    //         dosage: Value('500 mg'),
-    //         frequency: Value('3 times a day'),
-    //         quantity: Value(10 + rand.nextInt(10)),
-    //       ),
-    //     );
-    //   }
-    // }
+    for (int i = 0; i < 20; i++) {
+      final patient   = patientList[rand.nextInt(patientList.length)];
+      final physician = physicianList[rand.nextInt(physicianList.length)];
+      final int prescriptionId = await into(prescriptions).insert(
+        PrescriptionsCompanion.insert(
+          patientId: patient.id,
+          physicianId: physician.id,
+          status: Value('dispensed'),
+          instructions: Value('Take with meals, preferably after food.'),
+        ),
+      );
+      int itemsCount = 1 + rand.nextInt(3);
+      for (int j = 0; j < itemsCount; j++) {
+        final med = medicationList[rand.nextInt(medicationList.length)];
+        await into(prescriptionItems).insert(
+          PrescriptionItemsCompanion.insert(
+            prescriptionId: prescriptionId,
+            medicationId: med.medicationId,
+            dosage: Value('500 mg'),
+            frequency: Value('3 times a day'),
+            quantity: Value(10 + rand.nextInt(10)),
+          ),
+        );
+      }
+    }
 
     // --- Insert Feedback Entries ---
-  //   final List<User> allUsers = await select(users).get();
-  //   for (int i = 0; i < 50; i++) {
-  //     final randomUser = allUsers[rand.nextInt(allUsers.length)];
-  //     await into(feedbacks).insert(
-  //       FeedbacksCompanion.insert(
-  //         userId: randomUser.id,
-  //         message: 'I, ${randomUser.firstName} ${randomUser.lastName}, am very satisfied with the service.',
-  //       ),
-  //     );
-  //   }
+    final List<User> allUsers = await select(users).get();
+    for (int i = 0; i < 50; i++) {
+      final randomUser = allUsers[rand.nextInt(allUsers.length)];
+      await into(feedbacks).insert(
+        FeedbacksCompanion.insert(
+          userId: randomUser.id,
+          message: 'I, ${randomUser.firstName} ${randomUser.lastName}, am very satisfied with the service.',
+        ),
+      );
+    }
   //
   //   // --- Insert Audit Logs ---
-  //   for (int i = 0; i < 100; i++) {
-  //     final randomUser = allUsers[rand.nextInt(allUsers.length)];
-  //     await into(auditLogs).insert(
-  //       AuditLogsCompanion.insert(
-  //         userId: randomUser.id,
-  //         action: 'ACTION_$i',
-  //         details: Value('User ${randomUser.firstName} ${randomUser.lastName} performed action $i.'),
-  //       ),
-  //     );
-  //   }
+    for (int i = 0; i < 100; i++) {
+      final randomUser = allUsers[rand.nextInt(allUsers.length)];
+      await into(auditLogs).insert(
+        AuditLogsCompanion.insert(
+          userId: randomUser.id,
+          action: 'ACTION_$i',
+          details: Value('User ${randomUser.firstName} ${randomUser.lastName} performed action $i.'),
+        ),
+      );
+    }
   //
   //   // --- Insert Emergency Access Requests ---
-  //   for (int i = 0; i < 20; i++) {
-  //     final randomPatient   = patientList[rand.nextInt(patientList.length)];
-  //     final randomPhysician = physicianList[rand.nextInt(physicianList.length)];
-  //     await into(emergencyAccessRequests).insert(
-  //       EmergencyAccessRequestsCompanion.insert(
-  //         patientId: randomPatient.id,
-  //         physicianId: randomPhysician.id,
-  //         reason: 'Emergency: Immediate access needed for ${randomPatient.firstName} ${randomPatient.lastName}.',
-  //         status: Value('waiting'),
-  //       ),
-  //     );
-  //   }
+    for (int i = 0; i < 20; i++) {
+      final randomPatient   = patientList[rand.nextInt(patientList.length)];
+      final randomPhysician = physicianList[rand.nextInt(physicianList.length)];
+      await into(emergencyAccessRequests).insert(
+        EmergencyAccessRequestsCompanion.insert(
+          patientId: randomPatient.id,
+          physicianId: randomPhysician.id,
+          reason: 'Emergency: Immediate access needed for ${randomPatient.firstName} ${randomPatient.lastName}.',
+          status: Value('waiting'),
+        ),
+      );
+    }
   //
   //   // --- Insert Insurances ---
-  //   final List<String> insuranceCodes = ['A', 'B', 'C', 'D', 'E'];
-  //   for (int i = 0; i < insuranceCodes.length; i++) {
-  //     await into(insurances).insert(
-  //       InsurancesCompanion.insert(
-  //         name: 'Insurance ${insuranceCodes[i]}',
-  //         details: 'This insurance covers general health, dental, and vision services with a wide network of providers.',
-  //       ),
-  //     );
-  //   }
+    final List<String> insuranceCodes = ['A', 'B', 'C', 'D', 'E'];
+    for (int i = 0; i < insuranceCodes.length; i++) {
+      await into(insurances).insert(
+        InsurancesCompanion.insert(
+          name: 'Insurance ${insuranceCodes[i]}',
+          details: 'This insurance covers general health, dental, and vision services with a wide network of providers.',
+        ),
+      );
+    }
   //
   //   // --- Insert Pharmacy Insurances ---
-  //   final List<Insurance> insuranceList = await select(insurances).get();
-  //   for (var pharmacy in pharmacyList) {
-  //     final count = 1 + rand.nextInt(2);
-  //     for (int i = 0; i < count; i++) {
-  //       final ins = insuranceList[rand.nextInt(insuranceList.length)];
-  //       await into(pharmacyInsurances).insert(
-  //         PharmacyInsurancesCompanion.insert(
-  //           pharmacyId: pharmacy.pharmacyId,
-  //           insuranceId: ins.id,
-  //         ),
-  //       );
-  //     }
-  //   }
+    final List<Insurance> insuranceList = await select(insurances).get();
+    for (var pharmacy in pharmacyList) {
+      final count = 1 + rand.nextInt(2);
+      for (int i = 0; i < count; i++) {
+        final ins = insuranceList[rand.nextInt(insuranceList.length)];
+        await into(pharmacyInsurances).insert(
+          PharmacyInsurancesCompanion.insert(
+            pharmacyId: pharmacy.pharmacyId,
+            insuranceId: ins.id,
+          ),
+        );
+      }
+    }
   //   // --- Insert 30 Blockchain Transactions for Prescriptions with Controlled Medications ---
-  //   final List<Prescription> prescriptionList = await select(prescriptions).get();
-  //   for (int i = 0; i < 30; i++) {
-  //     final pres = prescriptionList[rand.nextInt(prescriptionList.length)];
-  //     await into(blockchainTransactions).insert(
-  //       BlockchainTransactionsCompanion.insert(
-  //         prescriptionId: pres.prescriptionId,
-  //         transactionHash: '0x${rand.nextInt(1000000).toRadixString(16)}',
-  //       ),
-  //     );
-  //   }
+    final List<Prescription> prescriptionList = await select(prescriptions).get();
+    for (int i = 0; i < 30; i++) {
+      final pres = prescriptionList[rand.nextInt(prescriptionList.length)];
+      await into(blockchainTransactions).insert(
+        BlockchainTransactionsCompanion.insert(
+          prescriptionId: pres.prescriptionId,
+          transactionHash: '0x${rand.nextInt(1000000).toRadixString(16)}',
+        ),
+      );
+    }
   }
 }

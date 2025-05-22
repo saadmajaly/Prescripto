@@ -335,7 +335,7 @@ class _NewPrescriptionState extends State<NewPrescription> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'RX ${idx + 1}',
+                  'Rx ${idx + 1}',
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),

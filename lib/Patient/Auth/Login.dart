@@ -16,6 +16,7 @@ class _WebLoginPageState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   final _nationalIdController = TextEditingController();
   final _passwordController = TextEditingController();
+  var showpass = true;
 
   @override
   void dispose() {
@@ -82,11 +83,6 @@ class _WebLoginPageState extends State<Login> {
                 decoration: InputDecoration(
                   labelText: 'National ID',
                   labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.image),
-                    onPressed: () {
-                    },
-                  ),
                   border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
@@ -102,14 +98,10 @@ class _WebLoginPageState extends State<Login> {
                 decoration: InputDecoration(
                   labelText: 'Password',
                   labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                    },
-                  ),
                   border: const OutlineInputBorder(),
                 ),
-                obscureText: true,
+                  obscureText: showpass,
+
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
